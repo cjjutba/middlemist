@@ -2,6 +2,18 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../generated/prisma';
 import { env } from './env';
 
+// Re-export Prisma enum types so the rest of the codebase doesn't need to
+// import directly from src/generated/prisma (which is forbidden by the
+// no-restricted-imports rule outside this file).
+export type {
+  AuditEntityType,
+  Currency,
+  ProjectStatus,
+  TaskStatus,
+  ProposalStatus,
+  InvoiceStatus,
+} from '../generated/prisma';
+
 /**
  * Prisma client singleton.
  *

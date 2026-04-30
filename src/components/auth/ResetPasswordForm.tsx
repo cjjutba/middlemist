@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { resetPassword } from '@/actions/auth';
+import { friendlyMessage } from '@/lib/utils/errors';
 import { AuthAlert } from './AuthAlert';
 
 const schema = z.object({
@@ -34,7 +35,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
     const result = await resetPassword({ token, password: values.password });
     setSubmitting(false);
     if (!result.ok) {
-      setFormError(result.error.message);
+      setFormError(friendlyMessage(result.error));
       return;
     }
     router.push('/login');

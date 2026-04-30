@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { verifyEmail } from '@/actions/auth';
 import { AuthAlert } from '@/components/auth/AuthAlert';
 import { AuthHeading } from '@/components/auth/AuthHeading';
+import { friendlyMessage } from '@/lib/utils/errors';
 
 export const metadata = {
   title: 'Verify email · Middlemist',
@@ -39,7 +40,7 @@ export default async function VerifyEmailTokenPage({
   return (
     <>
       <AuthHeading title="Verification failed" />
-      <AuthAlert tone="error">{result.error.message}</AuthAlert>
+      <AuthAlert tone="error">{friendlyMessage(result.error)}</AuthAlert>
       <p className="text-muted mt-6 text-[14px] leading-[1.5]">
         <Link href="/login" className="text-ink font-medium hover:underline">
           Back to sign in

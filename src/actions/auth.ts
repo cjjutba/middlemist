@@ -9,32 +9,35 @@ import {
   verifyEmailVerifyToken,
   verifyPasswordResetToken,
 } from '@/lib/auth/tokens';
+import type { ActionResult } from '@/lib/auth/with-auth';
+import { writeAudit } from '@/lib/audit/write';
 import { sendEmail } from '@/lib/email/send';
 import EmailVerify from '@/lib/email/templates/auth/email-verify';
 import PasswordReset from '@/lib/email/templates/auth/password-reset';
 import { env } from '@/lib/env';
-// Direct prisma access here is intentional and temporary; refactored to a
-// users.repo.ts in 2C. The lint rule allowlist exempts this file.
-import { prisma } from '@/lib/prisma';
+import { usersRepo } from '@/lib/repositories/users.repo';
 
 /**
- * Auth server actions.
+ * Auth server actions. These are NOT withAuth-wrapped because by definition
+ * they pre-date the session (signup, login) or operate on a token rather
+ * than a session (verify, reset). They return the same ActionResult shape
+ * as withAuth-wrapped actions for UI consistency.
  *
- * Tokens are JWTs signed with AUTH_SECRET (no token table; see
- * docs/spec/01-auth-and-account.md). Single-use:
+ * Token semantics — JWTs signed with AUTH_SECRET, no token table:
  *   - email-verify: User.emailVerifiedAt set on first redemption.
  *   - password-reset: User.passwordVersion bumped on first redemption.
  *
  * Anti-enumeration: requestPasswordReset always returns ok regardless of
  * whether the email matches a row.
+ *
+ * Audit log: signup writes user.signup; resetPassword writes
+ * user.password-changed. requestPasswordReset deliberately does NOT write
+ * an audit entry — doing so would let a probing attacker correlate request
+ * timing with row existence.
  */
 
 const VERIFICATION_TTL_HOURS = 24;
 const RESET_TTL_HOURS = 1;
-
-export type ActionResult<T = void> =
-  | { ok: true; data?: T }
-  | { ok: false; error: { code: string; message: string } };
 
 // ─── signup ───────────────────────────────────────────────────────────────
 
@@ -47,120 +50,99 @@ const signupSchema = z.object({
 export async function signup(input: z.input<typeof signupSchema>): Promise<ActionResult> {
   const parsed = signupSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: { code: 'VALIDATION', message: 'Invalid input.' } };
+    return { ok: false, error: 'VALIDATION', issues: parsed.error.issues };
   }
   const validation = validatePassword(parsed.data.password);
   if (!validation.valid) {
-    return { ok: false, error: { code: 'VALIDATION', message: validation.message } };
+    return { ok: false, error: 'VALIDATION' };
   }
 
-  const email = parsed.data.email.toLowerCase().trim();
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const existing = await usersRepo.findByEmail(parsed.data.email);
   if (existing) {
-    return {
-      ok: false,
-      error: { code: 'EMAIL_TAKEN', message: 'An account with that email already exists.' },
-    };
+    return { ok: false, error: 'EMAIL_TAKEN' };
   }
 
   const passwordHash = await hashPassword(parsed.data.password);
-  const user = await prisma.user.create({
-    data: {
-      name: parsed.data.name,
-      email,
-      passwordHash,
-    },
-    select: { id: true, name: true, email: true },
+  const user = await usersRepo.create({
+    name: parsed.data.name,
+    email: parsed.data.email,
+    passwordHash,
+  });
+
+  await writeAudit({
+    userId: user.id,
+    action: 'user.signup',
+    entityType: 'user',
+    entityId: user.id,
   });
 
   const token = await signEmailVerifyToken(user.id, user.email);
   const verifyUrl = `${env.NEXT_PUBLIC_APP_URL}/verify-email/${token}`;
-
   await sendEmail({
     to: user.email,
     subject: 'Verify your Middlemist email',
     react: EmailVerify({ name: user.name, verifyUrl, expiresInHours: VERIFICATION_TTL_HOURS }),
   });
 
-  return { ok: true };
+  return { ok: true, data: undefined };
 }
 
 // ─── verify email ─────────────────────────────────────────────────────────
 
-const verifyEmailSchema = z.object({
-  token: z.string().min(1),
-});
+const verifyEmailSchema = z.object({ token: z.string().min(1) });
 
 export async function verifyEmail(
   input: z.input<typeof verifyEmailSchema>,
 ): Promise<ActionResult<{ alreadyVerified: boolean }>> {
   const parsed = verifyEmailSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: { code: 'INVALID_TOKEN', message: 'Invalid verification link.' } };
+    return { ok: false, error: 'INVALID_TOKEN' };
   }
 
   let payload;
   try {
     payload = await verifyEmailVerifyToken(parsed.data.token);
   } catch {
-    return {
-      ok: false,
-      error: { code: 'INVALID_TOKEN', message: 'Verification link is invalid or expired.' },
-    };
+    return { ok: false, error: 'INVALID_TOKEN' };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: payload.userId },
-    select: { id: true, email: true, emailVerifiedAt: true },
-  });
+  const user = await usersRepo.findById(payload.userId);
   if (!user) {
-    return { ok: false, error: { code: 'INVALID_TOKEN', message: 'Account not found.' } };
+    return { ok: false, error: 'INVALID_TOKEN' };
   }
   if (user.email !== payload.email) {
-    return {
-      ok: false,
-      error: { code: 'INVALID_TOKEN', message: 'Verification link is no longer valid.' },
-    };
+    return { ok: false, error: 'INVALID_TOKEN' };
   }
 
   if (user.emailVerifiedAt) {
     return { ok: true, data: { alreadyVerified: true } };
   }
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { emailVerifiedAt: new Date() },
-  });
+  await usersRepo.setEmailVerifiedAt(user.id);
 
   return { ok: true, data: { alreadyVerified: false } };
 }
 
 // ─── request password reset ──────────────────────────────────────────────
 
-const requestPasswordResetSchema = z.object({
-  email: z.string().email().max(254),
-});
+const requestPasswordResetSchema = z.object({ email: z.string().email().max(254) });
 
 export async function requestPasswordReset(
   input: z.input<typeof requestPasswordResetSchema>,
 ): Promise<ActionResult> {
   const parsed = requestPasswordResetSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: true };
+    // Anti-enumeration: don't reveal validation failure either.
+    return { ok: true, data: undefined };
   }
-  const email = parsed.data.email.toLowerCase().trim();
 
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: { id: true, name: true, email: true, passwordVersion: true, emailVerifiedAt: true },
-  });
+  const user = await usersRepo.findByEmail(parsed.data.email);
   if (!user || !user.emailVerifiedAt) {
-    return { ok: true };
+    return { ok: true, data: undefined };
   }
 
   const token = await signPasswordResetToken(user.id, user.passwordVersion);
   const resetUrl = `${env.NEXT_PUBLIC_APP_URL}/reset-password/${token}`;
-
   await sendEmail({
     to: user.email,
     subject: 'Reset your Middlemist password',
@@ -171,7 +153,7 @@ export async function requestPasswordReset(
     }),
   });
 
-  return { ok: true };
+  return { ok: true, data: undefined };
 }
 
 // ─── reset password ──────────────────────────────────────────────────────
@@ -186,49 +168,39 @@ export async function resetPassword(
 ): Promise<ActionResult> {
   const parsed = resetPasswordSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: { code: 'VALIDATION', message: 'Invalid input.' } };
+    return { ok: false, error: 'VALIDATION', issues: parsed.error.issues };
   }
-
   const validation = validatePassword(parsed.data.password);
   if (!validation.valid) {
-    return { ok: false, error: { code: 'VALIDATION', message: validation.message } };
+    return { ok: false, error: 'VALIDATION' };
   }
 
   let payload;
   try {
     payload = await verifyPasswordResetToken(parsed.data.token);
   } catch {
-    return {
-      ok: false,
-      error: { code: 'INVALID_TOKEN', message: 'Reset link is invalid or expired.' },
-    };
+    return { ok: false, error: 'INVALID_TOKEN' };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: payload.userId },
-    select: { id: true, passwordVersion: true },
-  });
+  const user = await usersRepo.findById(payload.userId);
   if (!user) {
-    return { ok: false, error: { code: 'INVALID_TOKEN', message: 'Account not found.' } };
+    return { ok: false, error: 'INVALID_TOKEN' };
   }
   if (user.passwordVersion !== payload.passwordVersion) {
-    return {
-      ok: false,
-      error: { code: 'INVALID_TOKEN', message: 'Reset link has already been used.' },
-    };
+    return { ok: false, error: 'INVALID_TOKEN' };
   }
 
   const passwordHash = await hashPassword(parsed.data.password);
+  await usersRepo.setPasswordHash(user.id, passwordHash);
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      passwordHash,
-      passwordVersion: { increment: 1 },
-    },
+  await writeAudit({
+    userId: user.id,
+    action: 'user.password-changed',
+    entityType: 'user',
+    entityId: user.id,
   });
 
-  return { ok: true };
+  return { ok: true, data: undefined };
 }
 
 // ─── login / logout ──────────────────────────────────────────────────────
@@ -237,30 +209,17 @@ export async function login(formData: FormData): Promise<ActionResult> {
   const email = formData.get('email');
   const password = formData.get('password');
   if (typeof email !== 'string' || typeof password !== 'string') {
-    return { ok: false, error: { code: 'VALIDATION', message: 'Invalid input.' } };
+    return { ok: false, error: 'VALIDATION' };
   }
   try {
-    await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
-    return { ok: true };
+    await signIn('credentials', { email, password, redirect: false });
+    return { ok: true, data: undefined };
   } catch (e) {
-    const message = e instanceof Error ? e.message : 'UNKNOWN';
+    const message = e instanceof Error ? e.message : '';
     if (message === 'EMAIL_NOT_VERIFIED' || message.includes('EMAIL_NOT_VERIFIED')) {
-      return {
-        ok: false,
-        error: {
-          code: 'EMAIL_NOT_VERIFIED',
-          message: 'Verify your email to continue. Check your inbox for the verification link.',
-        },
-      };
+      return { ok: false, error: 'EMAIL_NOT_VERIFIED' };
     }
-    return {
-      ok: false,
-      error: { code: 'INVALID_CREDENTIALS', message: 'Incorrect email or password.' },
-    };
+    return { ok: false, error: 'INVALID_CREDENTIALS' };
   }
 }
 

@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { login } from '@/actions/auth';
+import { friendlyMessage } from '@/lib/utils/errors';
 import { AuthAlert } from './AuthAlert';
 
 const schema = z.object({
@@ -38,7 +39,7 @@ export function LoginForm() {
     const result = await login(formData);
     setSubmitting(false);
     if (!result.ok) {
-      setFormError(result.error.message);
+      setFormError(friendlyMessage(result.error));
       return;
     }
     router.push('/dashboard');
