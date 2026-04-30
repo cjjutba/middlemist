@@ -64,7 +64,7 @@ Upstash Ratelimit uses Redis under the hood with a sliding window primitive that
 
 ### shadcn/ui vs Material / Chakra / Mantine
 
-shadcn/ui is not a component library that you depend on; it is a set of accessible primitive components copied into the codebase. The product wants a heavy custom theme (deep moss accent, 7px radius, editorial typography, no rounded shadows everywhere). Material and Chakra and Mantine all carry strong design opinions that work against an editorial product. shadcn ships with Radix primitives for behavior and Tailwind for styling, both of which leave the visual design entirely to the project. This is the right shape for Middlemist.
+shadcn/ui is not a component library that you depend on; it is a set of accessible primitive components copied into the codebase. The product wants a heavy custom theme (Cal.com-adapted visual system, near-black primary CTAs, Inter Display as the display typeface, hairline borders and subtle shadows over heavy elevations). Material and Chakra and Mantine all carry strong design opinions that work against a clean modern-SaaS product. shadcn ships with Radix primitives for behavior and Tailwind for styling, both of which leave the visual design entirely to the project. This is the right shape for Middlemist.
 
 ### Tiptap vs Lexical / ProseMirror direct / Slate
 

@@ -64,3 +64,7 @@ The picks share two properties: serverless-friendly and TypeScript-native. The r
 **Rails.** Considered for the maturity of the framework and the all-included batteries. Lost because the author's day-to-day stack is JS/TS, the integration with React for client interactivity would mean two ecosystems, and the portfolio narrative is "modern web fullstack" not "classic web framework."
 
 **T3 stack (Next + tRPC + Prisma + NextAuth).** Considered. Most of the picks overlap. The difference is tRPC versus Server Actions. Server Actions were chosen because Next 15's first-class action support reduces API plumbing further and the type story is comparable for a single-app project. For a multi-app or mobile-client scenario, tRPC would win; not the situation here.
+
+## Note on visual system
+
+This ADR locks the engineering stack only. The visual system was updated to Cal.com-aligned tokens (white canvas, near-black primary, Inter Display + Inter, 8/12/16px radius scale) after the initial stack lock; see `docs/decisions/0007-visual-system-cal-com-aligned.md` and `docs/design/overview.md` for current tokens.

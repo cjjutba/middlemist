@@ -50,14 +50,20 @@ Rationale for each choice lives in `docs/architecture/tech-stack.md` and the rel
 
 ## Design tokens (locked)
 
-- **Accent color:** `#5A7A4F` (deep moss). The signature color. Used sparingly: primary actions, active state indicators, brand marks.
-- **Radius:** `7px`. The signature corner radius. Applied to cards, inputs, buttons, modals. Do not vary it without reason.
+The visual system is adapted from Cal.com: white canvas, near-black primary CTAs, Inter Display as the display typeface, light-gray feature cards, and a dark surface reserved for the footer (the only dark surface on every page). Generous whitespace, single primary action per band, monochrome at the action layer.
+
+- **Primary:** `#111111` (near-black). Primary CTAs, h1/h2 display type, brand mark. Press state `#242424`. The action layer is monochrome; primary buttons are never blue.
+- **Brand accent:** `#3b82f6`. Used sparingly on inline links and the occasional badge highlight. Never on a primary CTA.
+- **Surfaces:** Canvas `#ffffff` (default). Surface-soft `#f8f9fa` (nav-pill backgrounds, soft section dividers). Surface-card `#f5f5f5` (feature cards, testimonial cards, default avatar fills). Surface-dark `#101010` (the footer, and only the footer on most pages; the sole dark surface in the system besides toasts and tooltips).
+- **Radii:** 4 / 6 / 8 / 12 / 16 / pill / full. Buttons and inputs use 8px (`rounded.md`); content cards use 12px (`rounded.lg`); the hero mockup card uses 16px (`rounded.xl`); avatars and badge pills use full / pill. Never exceed 16px on a card.
 - **Typography:**
-  - **UI:** Inter (variable, 400/500/600).
-  - **Headings:** Inter Display (where loaded; falls back to Inter).
-  - **Editorial body:** Source Serif 4. Used in public document views (proposal, invoice, client portal). Not used in app chrome.
-  - **Mono:** JetBrains Mono. Code, IDs, numeric tables.
-- **No dark mode in v1.** Do not add a theme toggle. Do not add `dark:` variants. The product is editorial light-on-paper by intent.
+  - **Display:** Inter Display, weight 600, with negative letter-spacing (-0.5 to -2px). Substitute for Cal Sans (licensed and unavailable). Every display headline.
+  - **UI / body:** Inter, weight 400-600, 0 letter-spacing.
+  - **Mono:** JetBrains Mono. Code, invoice numbers, IDs.
+  - Never put body copy in Inter Display; never put a display headline in Inter. The boundary does not blur.
+- **Spacing:** 4px base unit. 96px section padding between editorial bands. 32px card internal padding (feature, pricing) or 24px (testimonial, mockup, footer columns at 16px).
+- **Surface pacing:** Never repeat the same surface mode in two consecutive bands. Alternate white → light-gray → white → product-mockup → white → dark-footer. The dark surface is a deliberate, scarce signal.
+- **No dark mode in v1.** Do not add a theme toggle. Do not add `dark:` variants. The dark surface only appears as the footer, the (future) featured pricing tier, and toasts/tooltips. It does not appear as a casual decorative card.
 
 Tokens live in `src/styles/tokens.css` (placeholder until written) and are exposed to Tailwind via the theme config. Do not write inline color or radius values; reference the token.
 

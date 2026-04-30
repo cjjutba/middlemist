@@ -19,7 +19,7 @@ src/lib/pdf/
     Header.tsx     // freelancer logo + business info
     AddressBlock.tsx
     typography.ts  // styles for headings, body, mono
-    colors.ts      // matches app design tokens (accent #5A7A4F, neutrals)
+    colors.ts      // matches app design tokens (primary #111111, neutrals)
 ```
 
 Both templates render synchronously from a fully-loaded model: the proposal or invoice with its lines/blocks, the freelancer (for branding), and the client (for address). Templates do not query the database; the route handler does that and passes hydrated objects.
@@ -112,8 +112,8 @@ Every PDF includes:
 
 - **Header**: freelancer's logo (from `User.logoUrl`), business name (`User.businessName`), and address (`User.businessAddress`).
 - **Footer**: page number, business name, optional tax ID (`User.businessTaxId`).
-- **Accent color**: deep moss `#5A7A4F` for headings, dividers, and the signature mark. Matches the web brand.
-- **Typography**: Inter for body and headings; Source Serif 4 for the document title and the editorial-quality body in proposals; JetBrains Mono for line item numbers in invoices. Fonts are bundled with `Font.register` at module load.
+- **Ink color**: `#111111` for headings, dividers, and the signature mark. The web brand is monochrome at the action layer; PDFs follow the same rule and use no color beyond ink and neutrals.
+- **Typography**: Inter Display (weight 600, negative letter-spacing) for the document title and section headings; Inter for body; JetBrains Mono for line item numbers and invoice numbers. Fonts are bundled with `Font.register` at module load.
 - **Signature** (proposals only): if the freelancer has uploaded `User.signatureUrl`, it renders above their typed name on the signature block. The client's typed name renders next to it after acceptance, with the timestamp and IP from `Proposal.acceptance*` fields.
 
 ## Accessibility
