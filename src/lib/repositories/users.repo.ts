@@ -100,4 +100,25 @@ export const usersRepo = {
       data: { deletedAt: null },
     });
   },
+
+  async setBusinessProfile(
+    userId: string,
+    input: {
+      businessName?: string;
+      defaultCurrency?: Currency;
+      logoUrl?: string | null;
+    },
+  ) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: input,
+    });
+  },
+
+  async markOnboardingComplete(userId: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: { onboardingDoneAt: new Date() },
+    });
+  },
 };
