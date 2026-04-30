@@ -1,4 +1,4 @@
-# 0004 — Inngest vs BullMQ
+# 0004: Inngest vs BullMQ
 
 **Date:** 2026-04-29
 **Status:** Accepted

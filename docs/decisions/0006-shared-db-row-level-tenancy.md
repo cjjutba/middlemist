@@ -1,11 +1,11 @@
-# 0006 — Shared Database, Row-Level Tenancy
+# 0006: Shared Database, Row-Level Tenancy
 
 **Date:** 2026-04-29
 **Status:** Accepted
 
 ## Context
 
-Middlemist is multi-tenant: many freelancers, each with their own clients, projects, proposals, invoices, and so on. Every authenticated read and write must be scoped to one freelancer's data. A leak across tenants would be product-ending — a portfolio project that exposed one paying client's invoices to another would close out the case study and the practice attached to it.
+Middlemist is multi-tenant: many freelancers, each with their own clients, projects, proposals, invoices, and so on. Every authenticated read and write must be scoped to one freelancer's data. A leak across tenants would be product-ending: a portfolio project that exposed one paying client's invoices to another would close out the case study and the practice attached to it.
 
 There are three standard patterns for SaaS multi-tenancy:
 

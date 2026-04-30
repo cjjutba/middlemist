@@ -26,7 +26,7 @@ When in doubt, ask "if this decision turns out wrong, will reversing it require 
 Every ADR is a markdown file with this structure:
 
 ```markdown
-# NNNN — <kebab-case title>
+# NNNN: <kebab-case title>
 
 **Date:** YYYY-MM-DD
 **Status:** Proposed | Accepted | Superseded by NNNN | Deprecated

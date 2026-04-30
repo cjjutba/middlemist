@@ -85,9 +85,9 @@ model NotificationRead {
 
 Convention: `{entity}.{verb}` in kebab-case. Verbs are past tense for things that happened. Some examples:
 
-- `proposal.viewed` — past tense, the client viewed it.
-- `invoice.marked-paid` — past tense compound, the freelancer marked it paid.
-- `file.deletion-pending` — slightly stretched, denotes a state ("deletion is pending"), not a strict verb. Acceptable because it reads naturally and is consistent with the schema's lifecycle model.
+- `proposal.viewed`: past tense, the client viewed it.
+- `invoice.marked-paid`: past tense compound, the freelancer marked it paid.
+- `file.deletion-pending`: slightly stretched, denotes a state ("deletion is pending"), not a strict verb. Acceptable because it reads naturally and is consistent with the schema's lifecycle model.
 
 New entity types are added to the `AuditEntityType` enum first, and a migration adds the value before code uses it.
 
@@ -95,7 +95,7 @@ New entity types are added to the `AuditEntityType` enum first, and a migration 
 
 `metadata` is structured JSON. The shape varies by action. Conventions:
 
-- **Views**: `{ ip, userAgent }`. (The columns also store `ip` and `userAgent`; the metadata duplication exists because some auditable views happen behind the scenes — `proposal.regenerated-token` is an example — and the columns may not be relevant.)
+- **Views**: `{ ip, userAgent }`. (The columns also store `ip` and `userAgent`; the metadata duplication exists because some auditable views happen behind the scenes, such as `proposal.regenerated-token`, and the columns may not be relevant.)
 - **Updates**: `{ field, oldValue, newValue }`. For `client.updated` etc., the metadata captures one or more `{field, oldValue, newValue}` triples. Sensitive fields (passwords, tokens) are not stored; their changes are logged with `oldValue` and `newValue` set to `"[redacted]"`.
 - **Status transitions**: `{ from, to }`. For `proposal.sent` after a `draft → sent` transition, metadata is `{ from: "draft", to: "sent" }`.
 - **Specific events**: each has its own shape. `proposal.accepted` includes `{ signatureName }`; `invoice.marked-paid` includes `{ amount, paidAt }`; `update.posted` includes `{ updateId, sentEmail: boolean }`.

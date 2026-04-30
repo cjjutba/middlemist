@@ -22,7 +22,7 @@ This narrowing is the most important product decision. It is what lets the schem
 
 ## Who this is for
 
-**Primary user:** CJ Jutba. A freelance full-stack developer in the Philippines who works with international clients, often in different currencies, on engagements that range from short fixed-fee projects to multi-month retainers. He needs the proposal-to-paid loop to be fast, branded, and quiet — no vendor noise, no irrelevant features, no client-facing surface that looks like a SaaS dashboard.
+**Primary user:** CJ Jutba. A freelance full-stack developer in the Philippines who works with international clients, often in different currencies, on engagements that range from short fixed-fee projects to multi-month retainers. He needs the proposal-to-paid loop to be fast, branded, and quiet: no vendor noise, no irrelevant features, no client-facing surface that looks like a SaaS dashboard.
 
 **Secondary users:** other solo creative freelancers (other developers first; designers, copywriters, and consultants if the model holds). The product is built for CJ's workflow first; if it generalizes, that is a happy outcome, not a target.
 

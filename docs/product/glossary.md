@@ -1,6 +1,6 @@
 # Glossary
 
-Terms are defined in Middlemist's specific context. The same word may mean something different in another product. When a term has a precise schema meaning (a model, an enum value, a column), the schema definition is authoritative — see `docs/architecture/data-model.md`.
+Terms are defined in Middlemist's specific context. The same word may mean something different in another product. When a term has a precise schema meaning (a model, an enum value, a column), the schema definition is authoritative; see `docs/architecture/data-model.md`.
 
 ## Freelancer
 

@@ -1,4 +1,4 @@
-# 0003 — Prisma vs Drizzle
+# 0003: Prisma vs Drizzle
 
 **Date:** 2026-04-29
 **Status:** Accepted

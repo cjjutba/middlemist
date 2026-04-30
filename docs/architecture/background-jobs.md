@@ -85,7 +85,7 @@ export const onProposalViewed = inngest.createFunction(
     });
 
     await step.run("send-notification-email", async () => {
-      // sendEmail(...) — see email-system.md
+      // sendEmail(...) see email-system.md
     });
 
     return { ok: true };

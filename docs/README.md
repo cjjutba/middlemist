@@ -6,15 +6,15 @@ The docs are written for two audiences in parallel: a human reading them on cjju
 
 ## Folder map
 
-- `product/` — what Middlemist is and what it is not. Overview, principles, glossary, and a parking lot for v2 ideas.
-- `architecture/` — cross-cutting technical concerns: data model, multi-tenancy, background jobs, email, file uploads, PDF, audit log, search, FX, public links.
-- `decisions/` — Architectural Decision Records (ADRs). One file per decision that constrains future code. Numbered, dated, immutable once accepted.
-- `security/` — authentication, authorization, public-link risk model, rate limiting, threat assumptions. (Wave 2.)
-- `spec/` — one file per v1 module: a complete description of the user-visible behavior, the data shape, the routes, the actions, and the tests. (Wave 3.)
-- `ui/` — the design system, layout primitives, accent rules, component inventory, and editorial conventions. (Wave 3.)
-- `ops/` — environments, secrets, deployment, observability, runbooks. (Wave 4.)
-- `planning/` — the sprint plan, the milestone map, the build order, and a rolling change log. (Wave 4.)
-- `assets/` — screenshots and diagrams referenced from the docs. (Filled as features ship.)
+- `product/`: what Middlemist is and what it is not. Overview, principles, glossary, and a parking lot for v2 ideas.
+- `architecture/`: cross-cutting technical concerns. Data model, multi-tenancy, background jobs, email, file uploads, PDF, audit log, search, FX, public links.
+- `decisions/`: Architectural Decision Records (ADRs). One file per decision that constrains future code. Numbered, dated, immutable once accepted.
+- `security/`: authentication, authorization, public-link risk model, rate limiting, threat assumptions. (Wave 2.)
+- `spec/`: one file per v1 module. A complete description of the user-visible behavior, the data shape, the routes, the actions, and the tests. (Wave 3.)
+- `ui/`: the design system, layout primitives, accent rules, component inventory, and editorial conventions. (Wave 3.)
+- `ops/`: environments, secrets, deployment, observability, runbooks. (Wave 4.)
+- `planning/`: the sprint plan, the milestone map, the build order, and a rolling change log. (Wave 4.)
+- `assets/`: screenshots and diagrams referenced from the docs. (Filled as features ship.)
 
 ## How to use this when starting a Claude Code session
 
@@ -48,7 +48,7 @@ The remaining wave docs (`security/`, `spec/`, `ui/`, `ops/`, `planning/`) are p
 
 - Headings: one `#` for the document title; `##` for sections; `###` for subsections; avoid going deeper than `####`.
 - Code: realistic, not pseudo-code. Use the actual stack (Prisma syntax, Next.js 15 App Router, TypeScript strict).
-- Cross-references: relative paths only, e.g., `[multi-tenancy](../architecture/multi-tenancy.md)`.
+- Cross-references: relative paths only. From a `docs/spec/foo.md`, link to architecture as `[multi-tenancy](../architecture/multi-tenancy.md)`. From this `docs/README.md`, link as `[multi-tenancy](architecture/multi-tenancy.md)`.
 - Tone: direct. No filler. No emojis. No em dashes (CJ does not use them).
 - Length: as long as the topic warrants and no longer. If you find yourself padding to hit a target, the topic is not yet well-defined.
 

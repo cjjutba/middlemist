@@ -33,12 +33,12 @@ JavaScript `number` is never used for amounts inside business logic. Only at dis
 ## Supported currencies (v1)
 
 ```
-PHP — Philippine peso (the freelancer's base; CJ is in PH)
-USD — US dollar (most common client currency)
-EUR — euro
-GBP — British pound
-AUD — Australian dollar
-CAD — Canadian dollar
+PHP: Philippine peso (the freelancer's base; CJ is in PH)
+USD: US dollar (most common client currency)
+EUR: euro
+GBP: British pound
+AUD: Australian dollar
+CAD: Canadian dollar
 ```
 
 The list is small on purpose. Adding a currency means adding it to the `Currency` enum, the FX refresh job, the locale formatting maps, and the UI selector. Each is small but the surface multiplies.

@@ -13,7 +13,7 @@ Why this and not schema-per-tenant or database-per-tenant for v1:
 
 Shared-database row-level isolation is the standard pattern for SaaS at this scale. Done right, it scales to thousands of tenants on one database. Done wrong, it leaks. The four enforcement layers ensure done-right.
 
-## Layer 1 — Repository pattern
+## Layer 1: Repository pattern
 
 Every Prisma query goes through a repository function in `src/lib/repositories/*.repo.ts`. Each function takes `userId` as its first argument and includes it in every Prisma `where` clause. There are no top-level repository functions for indirect-ownership tables (line items, attachments); those are accessed only through their parent's repo.
 
@@ -113,7 +113,7 @@ Two patterns to notice:
 - **`updateMany` over `update`.** Plain `prisma.client.update` accepts a unique `where` and would succeed if the user owned a client with that id, but if the id belongs to another user, Prisma throws a generic `P2025`. Using `updateMany` with a composite filter and checking `result.count` keeps the failure mode explicit and makes cross-tenant access a count-zero no-op rather than an exception that could leak the existence of a row.
 - **`findFirst` over `findUnique`.** `findUnique` cannot include `userId` in the where (id alone is unique). `findFirst` accepts the composite filter without needing a unique constraint.
 
-## Layer 2 — Server Action wrapper
+## Layer 2: Server Action wrapper
 
 Server Actions are the only mutation entry points the app exposes. Every action is wrapped with `withAuth`, which extracts `userId` from the session and refuses the call if no session is present. Actions do not accept `userId` from input. Ever.
 
@@ -167,7 +167,7 @@ export const createClient = withAuth(createClientSchema, async (userId, input) =
 
 The action signature does not include `userId`. The wrapper does. Code review for any new action checks that the action does not destructure `userId` from input.
 
-## Layer 3 — Public-link tables
+## Layer 3: Public-link tables
 
 Two entities are visible to unauthenticated viewers via a token in the URL: proposals (`/p/[token]`) and invoices (`/i/[token]`). Both have a `publicToken` column populated with `nanoid(21)` at row creation. The token is the only access proof. The repository function for public lookup looks like this:
 
@@ -189,9 +189,9 @@ The function does not take `userId`. This is the one repository pattern that doe
 
 Tokens never expose `userId`. Public routes never display data from any other user's rows even if the URL is on the same domain. The Server Component that renders the public proposal calls only this repo function and renders only the row it returned; there is no way to "list public proposals" or to enumerate by adjacent ID.
 
-The client portal magic-link flow uses a similar pattern but with hashed tokens — see `docs/architecture/public-links.md` for that variant.
+The client portal magic-link flow uses a similar pattern but with hashed tokens; see `docs/architecture/public-links.md` for that variant.
 
-## Layer 4 — Tests
+## Layer 4: Tests
 
 Every repository function has a two-user isolation test. The test seeds two users with overlapping data (a client named the same, a project with the same name, an invoice with the same number) and proves that user A's repo calls cannot see user B's data and vice versa.
 

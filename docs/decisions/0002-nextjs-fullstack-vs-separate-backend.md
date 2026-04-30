@@ -1,4 +1,4 @@
-# 0002 — Next.js Full-Stack vs Separate Backend
+# 0002: Next.js Full-Stack vs Separate Backend
 
 **Date:** 2026-04-29
 **Status:** Accepted

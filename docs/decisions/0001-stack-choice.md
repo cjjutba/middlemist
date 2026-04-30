@@ -1,4 +1,4 @@
-# 0001 — Stack Choice
+# 0001: Stack Choice
 
 **Date:** 2026-04-29
 **Status:** Accepted

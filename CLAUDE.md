@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Middlemist — Project Context
+# Middlemist Project Context
 
 ## What this is
 
@@ -136,7 +136,7 @@ A feature is not done until all of the following are true:
 
 Half-finished features do not get merged. If a feature is too large for one PR, the spec is split first, not the implementation.
 
-## Pointer table — when to load which doc
+## Pointer table: when to load which doc
 
 Claude Code sessions should load these files alongside `CLAUDE.md` based on the work in front of you:
 
@@ -158,12 +158,50 @@ Claude Code sessions should load these files alongside `CLAUDE.md` based on the 
 
 When in doubt, start with `docs/README.md` for the full map.
 
+## Test conventions
+
+Two layers of testing in v1:
+
+- **Vitest** for unit and integration tests. Lives next to source in `__tests__/` folders or `*.test.ts` files. Repository functions, services, zod schemas, email template rendering, PDF generation, and Inngest handlers all go through Vitest.
+- **Playwright** for end-to-end flows. Lives in `tests/e2e/`. Reserved for the few flows where a browser is the only honest way to test: signup-to-onboarding, public proposal acceptance, magic-link client portal redemption.
+
+Every repository function has a two-user isolation test (see Multi-tenancy above). Tests run against a real Postgres, not a Prisma mock. CI uses a Neon test branch dedicated to test runs; local dev uses a Postgres container or a separate Neon branch. Mocked Prisma cannot prove tenancy; only a real query against a real database can.
+
+Tests for jobs prove idempotency: run the handler twice, assert the end state matches running once. Email tests are snapshot-based on rendered HTML; the snapshot diff catches accidental layout regressions.
+
+## Migration discipline
+
+Database migrations live in `prisma/migrations/` and are committed alongside the schema change in the same PR. Never apply a migration in production that has not first been applied (and reverted, then reapplied) on a Neon branch. Rules:
+
+- One migration per logical change. Squash mid-PR if you accumulate scratch migrations.
+- Migrations that need raw SQL (extension creation, GIN indexes for `pg_trgm`, custom check constraints) live as a `migration.sql` file with the SQL written by hand.
+- Renaming a column is a two-step migration: add the new column, backfill, deploy, drop the old column in a second PR. Never rename in one shot in production.
+- Removing a column requires confirming no live code references it. Grep first; ESLint will not catch a stale Prisma-typed reference at compile time if the regenerated client has been updated.
+
+## Dev workflow
+
+The package manager is pnpm. Common scripts will live in `package.json` once the project is wired up:
+
+- `pnpm dev`: Next.js dev server.
+- `pnpm email:dev`: React Email preview at port 3001.
+- `pnpm db:studio`: Prisma Studio against the dev database.
+- `pnpm db:migrate`: `prisma migrate dev` against the dev database.
+- `pnpm test`: Vitest in watch mode locally, single-run in CI.
+- `pnpm test:e2e`: Playwright tests.
+- `pnpm lint`: ESLint including the custom `no-direct-prisma` rule.
+- `pnpm typecheck`: `tsc --noEmit`.
+
+Run `pnpm dlx inngest-cli@latest dev` separately to get the Inngest dev UI when working on background jobs.
+
 ## Process notes
 
 - Don't create files outside `docs/`, `src/`, `prisma/`, `public/`, `tests/`, and the project root config files. Don't create `notes.md`, `scratch.md`, `plan.md`, or analysis files unless asked.
 - Don't write comments that re-state the code. Don't reference the current task ("added for issue #X") in code comments.
-- Don't add backwards-compatibility shims. The codebase has no users to keep working — change the code in place.
+- Don't add backwards-compatibility shims. The codebase has no users to keep working; change the code in place.
 - Don't ship feature flags as a hedge. Ship the feature or don't.
 - Read the relevant Next.js 15 docs in `node_modules/next/dist/docs/` before writing routing or rendering code. The version in this repo has breaking changes from older Next versions and from training-data assumptions.
+- Currency is never a `number`. Use `Decimal` (Prisma runtime) and pair every monetary value with a `currency` ISO code. See `docs/architecture/fx-and-currency.md`.
+- Tokens are never logged. Magic-link tokens, session cookies, public links, and password hashes do not appear in `console.*`, in Sentry breadcrumbs, in audit metadata, or in error messages.
+- Time is always stored UTC. Convert to user timezone (`User.defaultTimezone`) only at presentation. The `dueDate`, `startedAt`, `endedAt`, `validUntil`, and similar fields are all UTC instants.
 
 The project is small enough that being clear and consistent matters more than being clever. Write the boring, correct version.

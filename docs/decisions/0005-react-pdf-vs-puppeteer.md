@@ -1,4 +1,4 @@
-# 0005 — react-pdf vs Puppeteer
+# 0005: react-pdf vs Puppeteer
 
 **Date:** 2026-04-29
 **Status:** Accepted
