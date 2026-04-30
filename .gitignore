@@ -33,6 +33,7 @@ yarn-error.log*
 # env files (.env.example IS tracked; everything else is local secrets)
 .env
 .env.local
+.env.test
 .env.*.local
 
 # Docker volumes are not in the repo, but be safe
