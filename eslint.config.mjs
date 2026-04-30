@@ -9,16 +9,22 @@ const eslintConfig = defineConfig([
   globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'src/generated/**']),
   {
     files: ['src/**/*.{ts,tsx}'],
-    ignores: ['src/lib/repositories/**', 'src/lib/db.ts', 'prisma/**'],
+    ignores: ['src/lib/repositories/**', 'src/lib/prisma.ts', 'prisma/**'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
           patterns: [
             {
-              group: ['@prisma/client', '@/lib/db'],
+              group: [
+                '@prisma/client',
+                '@prisma/client/**',
+                '@/lib/prisma',
+                '@/generated/prisma',
+                '@/generated/prisma/**',
+              ],
               message:
-                'Direct database/Prisma imports are forbidden outside src/lib/repositories. Use a repository function (see docs/engineering/repository-pattern.md).',
+                'Direct Prisma imports are forbidden outside src/lib/repositories. Use a repository function (see docs/engineering/repository-pattern.md).',
             },
           ],
         },
