@@ -22,29 +22,29 @@ When principles conflict: multi-tenancy beats everything (a leak is a product-en
 
 ## Tech stack
 
-| Layer | Choice |
-|---|---|
-| Framework | Next.js 15 App Router |
-| Language | TypeScript (strict) |
-| Database | PostgreSQL via Neon |
-| ORM | Prisma 6 |
-| Auth | Auth.js v5 (NextAuth) |
-| Background jobs | Inngest |
-| Email | Resend + React Email |
-| Files | UploadThing |
-| PDF | `@react-pdf/renderer` |
-| Rate limiting | Upstash Ratelimit |
-| Components | shadcn/ui (heavily themed) |
-| Editor | Tiptap v2 |
-| Forms | react-hook-form + zod |
-| Validation | zod (shared client/server) |
-| Search | Postgres `pg_trgm` |
-| Hosting | Vercel |
-| Package manager | pnpm |
-| Testing | Vitest + Playwright |
-| Error tracking | Sentry |
-| Analytics | Plausible |
-| FX | exchangerate.host |
+| Layer           | Choice                     |
+| --------------- | -------------------------- |
+| Framework       | Next.js 16 App Router      |
+| Language        | TypeScript (strict)        |
+| Database        | PostgreSQL via Neon        |
+| ORM             | Prisma 6                   |
+| Auth            | Auth.js v5 (NextAuth)      |
+| Background jobs | Inngest                    |
+| Email           | Resend + React Email       |
+| Files           | UploadThing                |
+| PDF             | `@react-pdf/renderer`      |
+| Rate limiting   | Upstash Ratelimit          |
+| Components      | shadcn/ui (heavily themed) |
+| Editor          | Tiptap v2                  |
+| Forms           | react-hook-form + zod      |
+| Validation      | zod (shared client/server) |
+| Search          | Postgres `pg_trgm`         |
+| Hosting         | Vercel                     |
+| Package manager | pnpm                       |
+| Testing         | Vitest + Playwright        |
+| Error tracking  | Sentry                     |
+| Analytics       | Plausible                  |
+| FX              | exchangerate.host          |
 
 Rationale for each choice lives in `docs/architecture/tech-stack.md` and the relevant ADR in `docs/decisions/`.
 
@@ -146,21 +146,21 @@ Half-finished features do not get merged. If a feature is too large for one PR, 
 
 Claude Code sessions should load these files alongside `CLAUDE.md` based on the work in front of you:
 
-| When working on... | Load these |
-|---|---|
-| Authentication, sessions, password reset | `docs/security/authentication.md` (Wave 2), `docs/architecture/multi-tenancy.md` |
-| Any feature module (proposals, invoices, etc.) | The matching `docs/spec/<module>.md` (Wave 3) |
-| Adding a background job | `docs/architecture/background-jobs.md`, `docs/architecture/email-system.md` if the job sends mail |
-| Adding a Prisma model | `docs/architecture/data-model.md`, `docs/architecture/multi-tenancy.md` |
-| Adding a public link or token | `docs/architecture/public-links.md` |
-| Adding a new email template | `docs/architecture/email-system.md` |
-| Adding a file upload context | `docs/architecture/file-uploads.md` |
-| Anything involving money | `docs/architecture/fx-and-currency.md` |
-| Adding search to a new entity | `docs/architecture/search.md` |
-| Adding a PDF | `docs/architecture/pdf-generation.md` |
-| Adding an audit-relevant action | `docs/architecture/audit-log.md` |
-| Considering a new architectural pattern | Read existing ADRs in `docs/decisions/`, then write a new one |
-| Wondering "should this be in v1?" | `docs/product/principles.md`, `docs/product/v2-wishlist.md` |
+| When working on...                             | Load these                                                                                        |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Authentication, sessions, password reset       | `docs/security/authentication.md` (Wave 2), `docs/architecture/multi-tenancy.md`                  |
+| Any feature module (proposals, invoices, etc.) | The matching `docs/spec/<module>.md` (Wave 3)                                                     |
+| Adding a background job                        | `docs/architecture/background-jobs.md`, `docs/architecture/email-system.md` if the job sends mail |
+| Adding a Prisma model                          | `docs/architecture/data-model.md`, `docs/architecture/multi-tenancy.md`                           |
+| Adding a public link or token                  | `docs/architecture/public-links.md`                                                               |
+| Adding a new email template                    | `docs/architecture/email-system.md`                                                               |
+| Adding a file upload context                   | `docs/architecture/file-uploads.md`                                                               |
+| Anything involving money                       | `docs/architecture/fx-and-currency.md`                                                            |
+| Adding search to a new entity                  | `docs/architecture/search.md`                                                                     |
+| Adding a PDF                                   | `docs/architecture/pdf-generation.md`                                                             |
+| Adding an audit-relevant action                | `docs/architecture/audit-log.md`                                                                  |
+| Considering a new architectural pattern        | Read existing ADRs in `docs/decisions/`, then write a new one                                     |
+| Wondering "should this be in v1?"              | `docs/product/principles.md`, `docs/product/v2-wishlist.md`                                       |
 
 When in doubt, start with `docs/README.md` for the full map.
 
