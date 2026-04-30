@@ -9,7 +9,7 @@ import { SelectField } from '@/components/ui/select-field';
 import { TextField } from '@/components/ui/text-field';
 import { TextareaField } from '@/components/ui/textarea-field';
 import {
-  PROJECT_STATUSES,
+  SELECTABLE_STATUSES,
   createProjectSchema,
   type CreateProjectInputZ,
 } from '@/lib/schemas/project.schema';
@@ -32,7 +32,6 @@ const STATUS_LABELS: Record<string, string> = {
   active: 'Active',
   on_hold: 'On hold',
   completed: 'Completed',
-  archived: 'Archived',
 };
 
 export function ProjectForm(props: Mode) {
@@ -104,7 +103,7 @@ export function ProjectForm(props: Mode) {
           {...register('status')}
           defaultValue={props.defaults?.status ?? 'active'}
         >
-          {PROJECT_STATUSES.map((s) => (
+          {SELECTABLE_STATUSES.map((s) => (
             <option key={s} value={s}>
               {STATUS_LABELS[s] ?? s}
             </option>

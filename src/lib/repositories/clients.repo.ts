@@ -43,6 +43,7 @@ export type UpdateClientInput = Partial<{
 export type ListClientsFilters = {
   search?: string;
   includeArchived?: boolean;
+  limit?: number;
 };
 
 export const clientsRepo = {
@@ -68,6 +69,7 @@ export const clientsRepo = {
           : {}),
       },
       orderBy: { name: 'asc' },
+      ...(filters.limit ? { take: filters.limit } : {}),
     });
   },
 

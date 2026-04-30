@@ -43,6 +43,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   const client = await clientsRepo.findById(session.user.id, project.clientId);
   const status = project.status as ProjectStatusValue;
+  const archived = Boolean(project.archivedAt);
 
   return (
     <div className="px-6 py-10 lg:px-12 lg:py-14">
@@ -70,13 +71,15 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Link href={`/projects/${project.id}/edit`}>
-              <Button variant="secondary">Edit</Button>
-            </Link>
+            {archived ? null : (
+              <Link href={`/projects/${project.id}/edit`}>
+                <Button variant="secondary">Edit</Button>
+              </Link>
+            )}
             <ProjectActions
               projectId={project.id}
               currentStatus={project.status}
-              archived={Boolean(project.archivedAt)}
+              archived={archived}
             />
           </div>
         </div>

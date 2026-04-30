@@ -33,11 +33,7 @@ export function ClientActions({ clientId, archived }: Props) {
     startTransition(async () => {
       const result = await deleteClient({ id: clientId });
       if (!result.ok) {
-        if (result.error === 'CLIENT_HAS_REFERENCES') {
-          alert('This client has projects, proposals, or invoices attached. Archive it instead.');
-        } else {
-          alert(friendlyMessage(result.error));
-        }
+        alert(friendlyMessage(result.error));
         return;
       }
       router.push('/clients');

@@ -32,7 +32,6 @@ export const saveBusinessName = withAuth(businessSchema, async (userId, input) =
     entityType: 'user',
     entityId: userId,
   });
-  return { ok: true } as const;
 });
 
 export const saveDefaultCurrency = withAuth(currencySchema, async (userId, input) => {
@@ -43,7 +42,6 @@ export const saveDefaultCurrency = withAuth(currencySchema, async (userId, input
     entityType: 'user',
     entityId: userId,
   });
-  return { ok: true } as const;
 });
 
 export const createFirstClient = withAuth(firstClientSchema, async (userId, input) => {
@@ -70,5 +68,4 @@ export const completeOnboarding = withAuth(noInputSchema, async (userId) => {
     entityId: userId,
   });
   revalidatePath('/dashboard');
-  return { ok: true } as const;
 });

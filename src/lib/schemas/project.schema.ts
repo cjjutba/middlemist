@@ -5,6 +5,10 @@ import { SUPPORTED_CURRENCIES } from './client.schema';
 export const PROJECT_STATUSES = ['active', 'on_hold', 'completed', 'archived'] as const;
 export type ProjectStatusValue = (typeof PROJECT_STATUSES)[number];
 
+// Statuses a user can pick in a form. 'archived' is a lifecycle state set by
+// the Archive button (which writes archivedAt), not a status the form chooses.
+export const SELECTABLE_STATUSES = ['active', 'on_hold', 'completed'] as const;
+
 const optionalString = (max: number) => z.string().trim().max(max).optional();
 
 // Date and number fields stay as plain strings here so the resolver's input
@@ -14,7 +18,7 @@ export const createProjectSchema = z.object({
   clientId: z.string().min(1, 'Pick a client'),
   name: z.string().trim().min(1, 'Name is required').max(160),
   description: optionalString(5000),
-  status: z.enum(PROJECT_STATUSES).optional(),
+  status: z.enum(SELECTABLE_STATUSES).optional(),
   currency: z.enum(SUPPORTED_CURRENCIES),
   budgetAmount: z
     .string()
@@ -37,7 +41,7 @@ export const updateProjectSchema = createProjectSchema.partial().omit({ clientId
 
 export const setProjectStatusSchema = z.object({
   id: z.string().min(1),
-  status: z.enum(PROJECT_STATUSES),
+  status: z.enum(SELECTABLE_STATUSES),
 });
 
 export type CreateProjectInputZ = z.infer<typeof createProjectSchema>;

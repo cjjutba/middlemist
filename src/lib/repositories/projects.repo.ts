@@ -109,11 +109,18 @@ export const projectsRepo = {
   },
 
   async update(userId: string, id: string, input: UpdateProjectInput): Promise<Project> {
+    // Archived projects are read-only. Filter on archivedAt: null in the
+    // updateMany so a stale page can't slip a write past the guard, then
+    // disambiguate the count-0 case (NOT_FOUND vs ARCHIVED) for the caller.
     const result = await prisma.project.updateMany({
-      where: { id, userId },
+      where: { id, userId, archivedAt: null },
       data: input,
     });
-    if (result.count === 0) throw new Error('PROJECT_NOT_FOUND');
+    if (result.count === 0) {
+      const existing = await this.findById(userId, id);
+      if (existing?.archivedAt) throw new Error('PROJECT_ARCHIVED');
+      throw new Error('PROJECT_NOT_FOUND');
+    }
     const updated = await this.findById(userId, id);
     if (!updated) throw new Error('PROJECT_NOT_FOUND');
     return updated;
@@ -128,7 +135,14 @@ export const projectsRepo = {
       where: { id, userId, archivedAt: null },
       data: { archivedAt: new Date() },
     });
-    if (result.count === 0) throw new Error('PROJECT_NOT_FOUND');
+    if (result.count === 0) {
+      // Disambiguate: a count of 0 can mean "row doesn't exist for this
+      // tenant" or "row exists but is already archived". The UI surfaces
+      // those as different copy.
+      const existing = await this.findById(userId, id);
+      if (existing?.archivedAt) throw new Error('PROJECT_ALREADY_ARCHIVED');
+      throw new Error('PROJECT_NOT_FOUND');
+    }
   },
 
   async unarchive(userId: string, id: string): Promise<void> {
@@ -136,6 +150,10 @@ export const projectsRepo = {
       where: { id, userId, archivedAt: { not: null } },
       data: { archivedAt: null },
     });
-    if (result.count === 0) throw new Error('PROJECT_NOT_FOUND');
+    if (result.count === 0) {
+      const existing = await this.findById(userId, id);
+      if (existing && !existing.archivedAt) throw new Error('PROJECT_NOT_ARCHIVED');
+      throw new Error('PROJECT_NOT_FOUND');
+    }
   },
 };

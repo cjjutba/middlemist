@@ -169,4 +169,68 @@ describe('projectsRepo (multi-tenant isolation)', () => {
       expect(archivedRow?.archivedAt).not.toBeNull();
     });
   });
+
+  describe('archived-state-semantics', () => {
+    it('archive() on already-archived row throws PROJECT_ALREADY_ARCHIVED', async () => {
+      const user = await createTestUser();
+      const client = await createTestClient(user.id);
+      const project = await createTestProject(user.id, client.id);
+      await projectsRepo.archive(user.id, project.id);
+
+      await expect(projectsRepo.archive(user.id, project.id)).rejects.toThrow(
+        'PROJECT_ALREADY_ARCHIVED',
+      );
+    });
+
+    it('unarchive() on non-archived row throws PROJECT_NOT_ARCHIVED', async () => {
+      const user = await createTestUser();
+      const client = await createTestClient(user.id);
+      const project = await createTestProject(user.id, client.id);
+
+      await expect(projectsRepo.unarchive(user.id, project.id)).rejects.toThrow(
+        'PROJECT_NOT_ARCHIVED',
+      );
+    });
+
+    it('update() on archived row throws PROJECT_ARCHIVED and does not mutate', async () => {
+      const user = await createTestUser();
+      const client = await createTestClient(user.id);
+      const project = await createTestProject(user.id, client.id, { name: 'Frozen' });
+      await projectsRepo.archive(user.id, project.id);
+
+      await expect(projectsRepo.update(user.id, project.id, { name: 'Edited' })).rejects.toThrow(
+        'PROJECT_ARCHIVED',
+      );
+
+      const reread = await projectsRepo.findById(user.id, project.id);
+      expect(reread?.name).toBe('Frozen');
+    });
+
+    it('setStatus() on archived row throws PROJECT_ARCHIVED', async () => {
+      const user = await createTestUser();
+      const client = await createTestClient(user.id);
+      const project = await createTestProject(user.id, client.id, { status: 'active' });
+      await projectsRepo.archive(user.id, project.id);
+
+      await expect(projectsRepo.setStatus(user.id, project.id, 'on_hold')).rejects.toThrow(
+        'PROJECT_ARCHIVED',
+      );
+    });
+
+    it('archive() on a non-existent id throws PROJECT_NOT_FOUND (not ALREADY_ARCHIVED)', async () => {
+      const user = await createTestUser();
+
+      await expect(projectsRepo.archive(user.id, 'no-such-project-id')).rejects.toThrow(
+        'PROJECT_NOT_FOUND',
+      );
+    });
+
+    it('unarchive() on a non-existent id throws PROJECT_NOT_FOUND (not NOT_ARCHIVED)', async () => {
+      const user = await createTestUser();
+
+      await expect(projectsRepo.unarchive(user.id, 'no-such-project-id')).rejects.toThrow(
+        'PROJECT_NOT_FOUND',
+      );
+    });
+  });
 });

@@ -97,6 +97,13 @@ const friendly: Record<string, string> = {
   PROPOSAL_NOT_FOUND: 'That proposal no longer exists.',
   INVOICE_NOT_FOUND: 'That invoice no longer exists.',
   USER_NOT_FOUND: 'That account no longer exists.',
+
+  // Lifecycle conflicts
+  CLIENT_HAS_REFERENCES:
+    'This client has projects, proposals, or invoices attached. Archive it instead.',
+  PROJECT_ARCHIVED: 'This project is archived. Unarchive it before making changes.',
+  PROJECT_ALREADY_ARCHIVED: 'This project is already archived.',
+  PROJECT_NOT_ARCHIVED: 'This project is not archived.',
 };
 
 export function friendlyMessage(code: string): string {

@@ -51,12 +51,12 @@ export function ProjectActions({ projectId, currentStatus, archived }: Props) {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {next ? (
+      {!archived && next ? (
         <Button variant="secondary" onClick={onToggle} disabled={pending}>
           {next.label}
         </Button>
       ) : null}
-      {currentStatus !== 'completed' ? (
+      {!archived && currentStatus !== 'completed' ? (
         <Button variant="secondary" onClick={onComplete} disabled={pending}>
           Mark complete
         </Button>

@@ -42,22 +42,22 @@ const RESULT_LIMIT = 6;
  */
 export const searchAll = withAuth(querySchema, async (userId, { q }) => {
   const [clients, projects] = await Promise.all([
-    clientsRepo.list(userId, q ? { search: q } : {}),
+    clientsRepo.list(userId, { limit: RESULT_LIMIT, ...(q ? { search: q } : {}) }),
     projectsRepo.list(userId, {
       includeArchived: false,
-      ...(q ? { search: q } : {}),
       limit: RESULT_LIMIT,
+      ...(q ? { search: q } : {}),
     }),
   ]);
 
   const results: SearchResults = {
-    clients: clients.slice(0, RESULT_LIMIT).map((c) => ({
+    clients: clients.map((c) => ({
       type: 'client',
       id: c.id,
       name: c.name,
       subtitle: c.companyName ?? c.email ?? null,
     })),
-    projects: projects.slice(0, RESULT_LIMIT).map((p) => ({
+    projects: projects.map((p) => ({
       type: 'project',
       id: p.id,
       name: p.name,
