@@ -90,20 +90,20 @@ States: loading (skeleton rows), error ("Search failed — try again"), empty (n
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `searchAll` | `{ query: string, limit?: number }` | `{ ok: true, data: GroupedResults }` | Read-only; no side effects. |
-| `getRecentItems` | `{ limit?: number }` | `{ ok: true, data: RecentItem[] }` | Read-only. |
+| Action           | Input                               | Output                               | Side effects                |
+| ---------------- | ----------------------------------- | ------------------------------------ | --------------------------- |
+| `searchAll`      | `{ query: string, limit?: number }` | `{ ok: true, data: GroupedResults }` | Read-only; no side effects. |
+| `getRecentItems` | `{ limit?: number }`                | `{ ok: true, data: RecentItem[] }`   | Read-only.                  |
 
 Result shape:
 
 ```ts
 type SearchResult =
-  | { type: "client", id, name, companyName?, email }
-  | { type: "project", id, name, clientName, status }
-  | { type: "proposal", id, title, clientName, status, total?, currency }
-  | { type: "invoice", id, number, clientName, status, total, currency }
-  | { type: "task", id, title, projectName, status, dueDate? };
+  | { type: 'client'; id; name; companyName?; email }
+  | { type: 'project'; id; name; clientName; status }
+  | { type: 'proposal'; id; title; clientName; status; total?; currency }
+  | { type: 'invoice'; id; number; clientName; status; total; currency }
+  | { type: 'task'; id; title; projectName; status; dueDate? };
 
 type GroupedResults = {
   clients: SearchResult[];

@@ -16,36 +16,36 @@ There is no `.env`, `.env.development`, or `.env.production` checked in. Next.js
 
 Never exposed to the client. No `NEXT_PUBLIC_` prefix. Reading any of these from a client component is a build-time error in the Next.js bundler.
 
-| Variable | Purpose |
-|---|---|
-| `AUTH_SECRET` | Auth.js session signing key. Used to sign and verify the session JWT, the email verification token, and the password reset token. |
-| `DATABASE_URL` | Postgres connection string for the Neon branch this environment uses. |
-| `RESEND_API_KEY` | Outbound email send. |
-| `RESEND_WEBHOOK_SECRET` | Verification of Resend bounce/complaint webhooks. |
-| `UPLOADTHING_SECRET` | Server-side UploadThing API authorization. |
-| `UPLOADTHING_TOKEN` | Token for the UploadThing v7 SDK. |
-| `UPSTASH_REDIS_REST_URL` | Upstash REST endpoint for rate-limit reads/writes. |
-| `UPSTASH_REDIS_REST_TOKEN` | Auth token for Upstash REST. |
-| `INNGEST_EVENT_KEY` | Outbound event signing for the Inngest client. |
-| `INNGEST_SIGNING_KEY` | Inbound webhook signature verification for Inngest. |
-| `SENTRY_DSN` | Sentry ingestion endpoint (server-side). |
-| `SENTRY_AUTH_TOKEN` | Sentry source-map upload during build. |
-| `EXCHANGERATE_HOST_KEY` | API key for `exchangerate.host`. |
-| `CRON_SECRET` | Bearer token verifying that a cron-triggered request came from Vercel's scheduler. |
-| `DISABLE_RATE_LIMITS` | Development-only override; the env reader rejects this in production. |
+| Variable                   | Purpose                                                                                                                           |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `AUTH_SECRET`              | Auth.js session signing key. Used to sign and verify the session JWT, the email verification token, and the password reset token. |
+| `DATABASE_URL`             | Postgres connection string for the Neon branch this environment uses.                                                             |
+| `RESEND_API_KEY`           | Outbound email send.                                                                                                              |
+| `RESEND_WEBHOOK_SECRET`    | Verification of Resend bounce/complaint webhooks.                                                                                 |
+| `UPLOADTHING_SECRET`       | Server-side UploadThing API authorization.                                                                                        |
+| `UPLOADTHING_TOKEN`        | Token for the UploadThing v7 SDK.                                                                                                 |
+| `UPSTASH_REDIS_REST_URL`   | Upstash REST endpoint for rate-limit reads/writes.                                                                                |
+| `UPSTASH_REDIS_REST_TOKEN` | Auth token for Upstash REST.                                                                                                      |
+| `INNGEST_EVENT_KEY`        | Outbound event signing for the Inngest client.                                                                                    |
+| `INNGEST_SIGNING_KEY`      | Inbound webhook signature verification for Inngest.                                                                               |
+| `SENTRY_DSN`               | Sentry ingestion endpoint (server-side).                                                                                          |
+| `SENTRY_AUTH_TOKEN`        | Sentry source-map upload during build.                                                                                            |
+| `EXCHANGERATE_HOST_KEY`    | API key for `exchangerate.host`.                                                                                                  |
+| `CRON_SECRET`              | Bearer token verifying that a cron-triggered request came from Vercel's scheduler.                                                |
+| `DISABLE_RATE_LIMITS`      | Development-only override; the env reader rejects this in production.                                                             |
 
 ### Public values
 
 Exposed to the client. The `NEXT_PUBLIC_` prefix is mandatory; the bundler inlines these into the JavaScript that ships to the browser.
 
-| Variable | Purpose |
-|---|---|
-| `NEXT_PUBLIC_APP_URL` | The application's canonical origin (e.g., `https://middlemist.app`). Used to construct absolute URLs in emails, OG tags, and the Origin check on public POST routes. |
-| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | The domain Plausible analytics tracks under. |
-| `NEXT_PUBLIC_SENTRY_DSN` | Sentry ingestion endpoint (client-side, separate project from server-side to avoid cross-runtime quota). |
-| `NEXT_PUBLIC_UPLOADTHING_PUBLIC_URL` | Public origin for UploadThing-served files (used by the rich-text image-host allowlist). |
+| Variable                             | Purpose                                                                                                                                                              |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_APP_URL`                | The application's canonical origin (e.g., `https://middlemist.app`). Used to construct absolute URLs in emails, OG tags, and the Origin check on public POST routes. |
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`       | The domain Plausible analytics tracks under.                                                                                                                         |
+| `NEXT_PUBLIC_SENTRY_DSN`             | Sentry ingestion endpoint (client-side, separate project from server-side to avoid cross-runtime quota).                                                             |
+| `NEXT_PUBLIC_UPLOADTHING_PUBLIC_URL` | Public origin for UploadThing-served files (used by the rich-text image-host allowlist).                                                                             |
 
-A value without `NEXT_PUBLIC_` is *server-only*. A value with the prefix is *visible to anyone who views the page source*. Mistaking the two is a leak: a server-only value with the public prefix would be inlined into the bundle and shipped to every visitor.
+A value without `NEXT_PUBLIC_` is _server-only_. A value with the prefix is _visible to anyone who views the page source_. Mistaking the two is a leak: a server-only value with the public prefix would be inlined into the bundle and shipped to every visitor.
 
 ## Naming rule
 
@@ -53,7 +53,7 @@ Server secrets must NOT start with `NEXT_PUBLIC_`. Public values MUST start with
 
 ```typescript
 // src/lib/env.ts
-import { z } from "zod";
+import { z } from 'zod';
 
 const serverSchema = z.object({
   AUTH_SECRET: z.string().min(32),
@@ -71,7 +71,7 @@ const serverSchema = z.object({
   EXCHANGERATE_HOST_KEY: z.string().min(1),
   CRON_SECRET: z.string().min(32),
   DISABLE_RATE_LIMITS: z.string().optional(),
-  NODE_ENV: z.enum(["development", "test", "production"]),
+  NODE_ENV: z.enum(['development', 'test', 'production']),
 });
 
 const clientSchema = z.object({
@@ -81,7 +81,7 @@ const clientSchema = z.object({
   NEXT_PUBLIC_UPLOADTHING_PUBLIC_URL: z.string().url(),
 });
 
-const isServer = typeof window === "undefined";
+const isServer = typeof window === 'undefined';
 
 const serverEnv = isServer ? serverSchema.parse(process.env) : ({} as never);
 const clientEnv = clientSchema.parse({
@@ -91,8 +91,8 @@ const clientEnv = clientSchema.parse({
   NEXT_PUBLIC_UPLOADTHING_PUBLIC_URL: process.env.NEXT_PUBLIC_UPLOADTHING_PUBLIC_URL,
 });
 
-if (isServer && serverEnv.NODE_ENV === "production" && serverEnv.DISABLE_RATE_LIMITS === "true") {
-  throw new Error("DISABLE_RATE_LIMITS must not be true in production");
+if (isServer && serverEnv.NODE_ENV === 'production' && serverEnv.DISABLE_RATE_LIMITS === 'true') {
+  throw new Error('DISABLE_RATE_LIMITS must not be true in production');
 }
 
 export const env = { ...serverEnv, ...clientEnv } as typeof serverEnv & typeof clientEnv;
@@ -142,14 +142,15 @@ NEXT_PUBLIC_UPLOADTHING_PUBLIC_URL=https://utfs.io
 A `pre-commit` hook (or a manual check during code review) catches the rare accidental commit of `.env.local`. The git-ignored entry covers the common case.
 
 For dev databases, two options:
+
 - A separate Neon branch for development. This is the recommended path; it is identical to production in shape and the connection string drops in.
 - A local Postgres via Docker (`docker compose up`). Useful for offline work; the schema is bootstrapped with `pnpm db:migrate`.
 
 ## Vercel
 
-Configuration lives at *Project Settings → Environment Variables*. Each variable is set per environment with the appropriate scope checkboxes (Production / Preview / Development).
+Configuration lives at _Project Settings → Environment Variables_. Each variable is set per environment with the appropriate scope checkboxes (Production / Preview / Development).
 
-Production and Preview should differ on the values that drive *which database, which email provider account, which Redis, which UploadThing project* the app talks to:
+Production and Preview should differ on the values that drive _which database, which email provider account, which Redis, which UploadThing project_ the app talks to:
 
 - `DATABASE_URL` (production and preview should use separate Neon branches; preview shares one branch across all preview deploys but is separate from production).
 - `RESEND_API_KEY` (a sandbox key for preview if available; otherwise the same key, with bounce-handling on a per-environment Resend domain).

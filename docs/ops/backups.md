@@ -9,7 +9,7 @@ Neon supports point-in-time recovery on every branch. The retention depends on t
 - **Free tier:** 7 days.
 - **Launch / Scale:** up to 30 days.
 
-PITR restores produce a *new branch* at a chosen timestamp; the existing branch is unaffected. The new branch can be promoted as production (by switching the `DATABASE_URL`) or used as a staging environment to inspect the historical state.
+PITR restores produce a _new branch_ at a chosen timestamp; the existing branch is unaffected. The new branch can be promoted as production (by switching the `DATABASE_URL`) or used as a staging environment to inspect the historical state.
 
 **Why PITR.** It is operationally trivial. A click in the Neon dashboard produces the restored branch in a few minutes. There is no `pg_restore` to run, no dump file to copy, no schema reconciliation step. For the most likely incident (a destructive migration ran 30 minutes ago), PITR is the right tool.
 
@@ -22,29 +22,29 @@ A weekly Inngest cron (`backup.weekly-dump`) runs `pg_dump` against the producti
 ```typescript
 // src/lib/inngest/functions/backup-weekly-dump.ts (sketch)
 export const backupWeeklyDump = inngest.createFunction(
-  { id: "backup.weekly-dump" },
-  { cron: "0 6 * * 0" }, // 06:00 UTC every Sunday
+  { id: 'backup.weekly-dump' },
+  { cron: '0 6 * * 0' }, // 06:00 UTC every Sunday
   async ({ step }) => {
-    const { dumpUrl, sizeBytes, sha256 } = await step.run("dump", async () => {
+    const { dumpUrl, sizeBytes, sha256 } = await step.run('dump', async () => {
       // execute pg_dump and stream to R2
       return runDumpAndUpload();
     });
 
-    await step.run("audit", () =>
+    await step.run('audit', () =>
       writeAudit({
         userId: null,
-        action: "backup.completed",
-        entityType: "user",
-        entityId: "system",
+        action: 'backup.completed',
+        entityType: 'user',
+        entityId: 'system',
         metadata: { dumpUrl, sizeBytes, sha256 },
-      })
+      }),
     );
 
-    await step.run("rotate", async () => {
+    await step.run('rotate', async () => {
       // delete dumps older than 12 weeks
       return rotateOldDumps(12 * 7);
     });
-  }
+  },
 );
 ```
 
@@ -60,13 +60,13 @@ The dump is encrypted at rest in R2 (Cloudflare's default). The R2 bucket has a 
 
 PITR is operationally easy, single-provider. Weekly dumps are off-platform, slower to restore. Together they cover the main failure modes:
 
-| Failure mode | PITR helps? | Dump helps? |
-|---|---|---|
-| Destructive migration applied an hour ago | Yes (restore to T-1 hour) | Yes (slower; restore last week's dump and replay) |
-| Single row deleted accidentally | Yes (restore branch, copy row, drop branch) | Yes (slow; restore dump, copy row) |
-| Neon account-level incident | No | Yes (restore dump to a fresh provider) |
-| R2 bucket compromise | Not affected | Operationally lose insurance until next week's dump |
-| Ransomware-style attack on the database | Yes (restore to T-before-attack) | Yes (alternate path) |
+| Failure mode                              | PITR helps?                                 | Dump helps?                                         |
+| ----------------------------------------- | ------------------------------------------- | --------------------------------------------------- |
+| Destructive migration applied an hour ago | Yes (restore to T-1 hour)                   | Yes (slower; restore last week's dump and replay)   |
+| Single row deleted accidentally           | Yes (restore branch, copy row, drop branch) | Yes (slow; restore dump, copy row)                  |
+| Neon account-level incident               | No                                          | Yes (restore dump to a fresh provider)              |
+| R2 bucket compromise                      | Not affected                                | Operationally lose insurance until next week's dump |
+| Ransomware-style attack on the database   | Yes (restore to T-before-attack)            | Yes (alternate path)                                |
 
 The Venn diagram is: PITR is fast for common incidents; dumps are slow but cover the catastrophic ones.
 
@@ -127,8 +127,8 @@ Backups that have never been tested are not backups. The drill cadence:
 
 The drills are executed by the operator. Each drill writes an audit row (`backup.drill-pitr`, `backup.drill-dump`) with a metadata field of `{ outcome: "ok" | "issue", notes }`. The most recent drill date is recorded at the bottom of this document so the operator knows when the last verification happened.
 
-**Last PITR drill:** *(record on first run)*
-**Last dump drill:** *(record on first run)*
+**Last PITR drill:** _(record on first run)_
+**Last dump drill:** _(record on first run)_
 
 A drill that surfaces an issue (a missing column, a corrupted dump, a permission problem) gets a same-week fix; the drill is repeated until it passes.
 

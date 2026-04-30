@@ -34,16 +34,16 @@ The ESLint rule:
 export default [
   {
     rules: {
-      "react/no-danger": ["error"],
+      'react/no-danger': ['error'],
     },
   },
   {
     files: [
-      "src/components/rich-text/proposal-block-renderer.tsx",
-      "src/components/rich-text/update-renderer.tsx",
+      'src/components/rich-text/proposal-block-renderer.tsx',
+      'src/components/rich-text/update-renderer.tsx',
     ],
     rules: {
-      "react/no-danger": "off",
+      'react/no-danger': 'off',
     },
   },
 ];
@@ -58,9 +58,7 @@ Tiptap stores documents as JSON, not as HTML, in the database. The shape:
 ```json
 {
   "type": "doc",
-  "content": [
-    { "type": "paragraph", "content": [{ "type": "text", "text": "Hello" }] }
-  ]
+  "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Hello" }] }]
 }
 ```
 
@@ -70,23 +68,23 @@ The schema validator runs at write time:
 
 ```typescript
 // src/lib/rich-text/validate.ts
-import { z } from "zod";
+import { z } from 'zod';
 
 const allowedNodeTypes = [
-  "doc",
-  "paragraph",
-  "heading",
-  "bulletList",
-  "orderedList",
-  "listItem",
-  "blockquote",
-  "codeBlock",
-  "horizontalRule",
-  "image",
-  "text",
+  'doc',
+  'paragraph',
+  'heading',
+  'bulletList',
+  'orderedList',
+  'listItem',
+  'blockquote',
+  'codeBlock',
+  'horizontalRule',
+  'image',
+  'text',
 ] as const;
 
-const allowedMarkTypes = ["bold", "italic", "code", "link"] as const;
+const allowedMarkTypes = ['bold', 'italic', 'code', 'link'] as const;
 
 export const richTextNodeSchema: z.ZodType = z.lazy(() =>
   z.object({
@@ -99,15 +97,15 @@ export const richTextNodeSchema: z.ZodType = z.lazy(() =>
         z.object({
           type: z.enum(allowedMarkTypes),
           attrs: z.record(z.unknown()).optional(),
-        })
+        }),
       )
       .optional(),
-  })
+  }),
 );
 
 export const richTextDocSchema = richTextNodeSchema.refine(
-  (n) => n.type === "doc",
-  "Root node must be a doc"
+  (n) => n.type === 'doc',
+  'Root node must be a doc',
 );
 ```
 
@@ -121,22 +119,22 @@ Because the renderer is configured with the same allowlist as the schema, the pr
 
 ```typescript
 // src/lib/rich-text/render.ts
-import { generateHTML } from "@tiptap/html";
-import { Document } from "@tiptap/extension-document";
-import { Paragraph } from "@tiptap/extension-paragraph";
-import { Text } from "@tiptap/extension-text";
-import { Heading } from "@tiptap/extension-heading";
-import { BulletList } from "@tiptap/extension-bullet-list";
-import { OrderedList } from "@tiptap/extension-ordered-list";
-import { ListItem } from "@tiptap/extension-list-item";
-import { Blockquote } from "@tiptap/extension-blockquote";
-import { CodeBlock } from "@tiptap/extension-code-block";
-import { Bold } from "@tiptap/extension-bold";
-import { Italic } from "@tiptap/extension-italic";
-import { Code } from "@tiptap/extension-code";
-import { Link } from "@tiptap/extension-link";
-import { Image } from "@tiptap/extension-image";
-import { HorizontalRule } from "@tiptap/extension-horizontal-rule";
+import { generateHTML } from '@tiptap/html';
+import { Document } from '@tiptap/extension-document';
+import { Paragraph } from '@tiptap/extension-paragraph';
+import { Text } from '@tiptap/extension-text';
+import { Heading } from '@tiptap/extension-heading';
+import { BulletList } from '@tiptap/extension-bullet-list';
+import { OrderedList } from '@tiptap/extension-ordered-list';
+import { ListItem } from '@tiptap/extension-list-item';
+import { Blockquote } from '@tiptap/extension-blockquote';
+import { CodeBlock } from '@tiptap/extension-code-block';
+import { Bold } from '@tiptap/extension-bold';
+import { Italic } from '@tiptap/extension-italic';
+import { Code } from '@tiptap/extension-code';
+import { Link } from '@tiptap/extension-link';
+import { Image } from '@tiptap/extension-image';
+import { HorizontalRule } from '@tiptap/extension-horizontal-rule';
 
 const extensions = [
   Document,
@@ -153,13 +151,13 @@ const extensions = [
   Code,
   Link.configure({
     HTMLAttributes: {
-      rel: "noopener noreferrer",
-      target: "_blank",
+      rel: 'noopener noreferrer',
+      target: '_blank',
     },
-    protocols: ["http", "https", "mailto"],
+    protocols: ['http', 'https', 'mailto'],
   }),
   Image.configure({
-    HTMLAttributes: { loading: "lazy" },
+    HTMLAttributes: { loading: 'lazy' },
   }),
   HorizontalRule,
 ];
@@ -177,54 +175,54 @@ After the Tiptap renderer produces HTML, the output goes through `sanitize-html`
 
 ```typescript
 // src/lib/rich-text/sanitize.ts
-import sanitizeHtml from "sanitize-html";
-import { env } from "@/lib/env";
+import sanitizeHtml from 'sanitize-html';
+import { env } from '@/lib/env';
 
 const UPLOADTHING_HOST = new URL(env.UPLOADTHING_PUBLIC_URL).host;
 
 export function sanitizeRichTextHtml(html: string): string {
   return sanitizeHtml(html, {
     allowedTags: [
-      "h1",
-      "h2",
-      "h3",
-      "p",
-      "ul",
-      "ol",
-      "li",
-      "strong",
-      "em",
-      "code",
-      "pre",
-      "blockquote",
-      "hr",
-      "a",
-      "img",
-      "br",
+      'h1',
+      'h2',
+      'h3',
+      'p',
+      'ul',
+      'ol',
+      'li',
+      'strong',
+      'em',
+      'code',
+      'pre',
+      'blockquote',
+      'hr',
+      'a',
+      'img',
+      'br',
     ],
     allowedAttributes: {
-      a: ["href", "rel", "target"],
-      img: ["src", "alt", "loading"],
+      a: ['href', 'rel', 'target'],
+      img: ['src', 'alt', 'loading'],
     },
-    allowedSchemes: ["http", "https", "mailto"],
+    allowedSchemes: ['http', 'https', 'mailto'],
     allowedSchemesByTag: {
-      img: ["https"],
+      img: ['https'],
     },
-    allowedSchemesAppliedToAttributes: ["href", "src"],
+    allowedSchemesAppliedToAttributes: ['href', 'src'],
     transformTags: {
-      a: sanitizeHtml.simpleTransform("a", {
-        rel: "noopener noreferrer",
-        target: "_blank",
+      a: sanitizeHtml.simpleTransform('a', {
+        rel: 'noopener noreferrer',
+        target: '_blank',
       }),
       img: (tagName, attribs) => {
         try {
           const u = new URL(attribs.src);
           if (u.host !== UPLOADTHING_HOST) {
-            return { tagName: "p", attribs: {}, text: "" };
+            return { tagName: 'p', attribs: {}, text: '' };
           }
-          return { tagName: "img", attribs };
+          return { tagName: 'img', attribs };
         } catch {
-          return { tagName: "p", attribs: {}, text: "" };
+          return { tagName: 'p', attribs: {}, text: '' };
         }
       },
     },
@@ -272,7 +270,7 @@ Three layers (schema, renderer, sanitizer) and a CI rule enforcing the file boun
 React Email templates render to HTML on the server before going to Resend. The same sanitizer applies to user-customizable fields:
 
 - The freelancer's signature block (markdown). Rendered with `marked` to HTML, then run through `sanitize-html` with the same allowlist as rich-text.
-- The freelancer's customized subject (per-template, supports `{variable}` syntax). The variable expansion runs *before* the subject is rendered into the email; values from `{client_name}`, `{project_name}`, etc. are HTML-encoded with a small helper that handles `&`, `<`, `>`, `"`, `'`. (Email subject lines are not HTML, but providers occasionally render them in HTML preview panes; encoding makes the rendering identical regardless.)
+- The freelancer's customized subject (per-template, supports `{variable}` syntax). The variable expansion runs _before_ the subject is rendered into the email; values from `{client_name}`, `{project_name}`, etc. are HTML-encoded with a small helper that handles `&`, `<`, `>`, `"`, `'`. (Email subject lines are not HTML, but providers occasionally render them in HTML preview panes; encoding makes the rendering identical regardless.)
 - The freelancer's customized body (per-template, markdown, supports `{variable}` syntax). Rendered through `marked` and `sanitize-html` exactly like the signature.
 
 System-defined templates (`welcome`, `password-reset`, `email-verify`) interpolate user data only into safe positions: a name into a salutation (escaped by React), a URL into an `<a href>` (validated to start with `https://` and to point to the application's own host).
@@ -299,10 +297,10 @@ const csp = [
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
-  "upgrade-insecure-requests",
-].join("; ");
+  'upgrade-insecure-requests',
+].join('; ');
 
-response.headers.set("Content-Security-Policy", csp);
+response.headers.set('Content-Security-Policy', csp);
 ```
 
 Notes on the policy:

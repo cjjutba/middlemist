@@ -27,7 +27,7 @@ Public-token possession grants:
 - **Read** of the specific Proposal or Invoice referenced by the token.
 - **One state transition for proposals only**: accept or decline. The transition writes a typed signature, captures IP and user agent, and updates `Proposal.status` and `Proposal.acceptedAt` / `declinedAt`. There is no other write capability.
 
-Public-token possession does *not* grant any of the following: read of any other row, listing of entities, impersonation of the freelancer, access to the dashboard, access to other proposals or invoices owned by the same freelancer.
+Public-token possession does _not_ grant any of the following: read of any other row, listing of entities, impersonation of the freelancer, access to the dashboard, access to other proposals or invoices owned by the same freelancer.
 
 ## Authorization rules
 
@@ -46,7 +46,7 @@ export const updateClient = withAuth(
   z.object({ id: z.string(), name: z.string().min(1).max(120) }),
   async (userId, input) => {
     return clientsRepo.update(userId, input.id, { name: input.name });
-  }
+  },
 );
 ```
 
@@ -60,7 +60,7 @@ A "the edit button is hidden if you do not own this row" approach is not authori
 
 ### Rule 4: every authenticated entry point goes through `withAuth`
 
-Server actions, route handlers that read user data, and any other surface that exposes data to a logged-in user runs through `withAuth` (or, for route handlers, the equivalent explicit `auth()` call followed by a `userId` extraction). A surface that does *not* go through this pattern is treated as a bug.
+Server actions, route handlers that read user data, and any other surface that exposes data to a logged-in user runs through `withAuth` (or, for route handlers, the equivalent explicit `auth()` call followed by a `userId` extraction). A surface that does _not_ go through this pattern is treated as a bug.
 
 ### Rule 5: portal queries take `PortalContext`, not `userId`
 
@@ -72,7 +72,7 @@ export const portalRepo = {
   async listProjects(ctx: PortalContext) {
     return prisma.project.findMany({
       where: { userId: ctx.userId, clientId: ctx.clientId, archivedAt: null },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { updatedAt: 'desc' },
     });
   },
 };
@@ -101,7 +101,7 @@ The full chain from action to repo demonstrates every layer. Below is an end-to-
 
 ```typescript
 // src/lib/schemas/project.schema.ts
-import { z } from "zod";
+import { z } from 'zod';
 
 export const updateProjectSchema = z.object({
   id: z.string().min(1),
@@ -112,7 +112,7 @@ export const updateProjectSchema = z.object({
 
 ```typescript
 // src/lib/repositories/projects.repo.ts (excerpt)
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export const projectsRepo = {
   async findById(userId: string, id: string) {
@@ -121,16 +121,12 @@ export const projectsRepo = {
     });
   },
 
-  async update(
-    userId: string,
-    id: string,
-    input: { name: string; description?: string | null }
-  ) {
+  async update(userId: string, id: string, input: { name: string; description?: string | null }) {
     const result = await prisma.project.updateMany({
       where: { id, userId },
       data: input,
     });
-    if (result.count === 0) throw new Error("PROJECT_NOT_FOUND");
+    if (result.count === 0) throw new Error('PROJECT_NOT_FOUND');
     return projectsRepo.findById(userId, id);
   },
 };
@@ -138,22 +134,18 @@ export const projectsRepo = {
 
 ```typescript
 // src/lib/services/projects.service.ts
-import { projectsRepo } from "@/lib/repositories/projects.repo";
-import { writeAudit } from "@/lib/audit/write";
+import { projectsRepo } from '@/lib/repositories/projects.repo';
+import { writeAudit } from '@/lib/audit/write';
 
 export const projectsService = {
-  async rename(
-    userId: string,
-    id: string,
-    input: { name: string; description?: string | null }
-  ) {
+  async rename(userId: string, id: string, input: { name: string; description?: string | null }) {
     const before = await projectsRepo.findById(userId, id);
-    if (!before) throw new Error("PROJECT_NOT_FOUND");
+    if (!before) throw new Error('PROJECT_NOT_FOUND');
     const after = await projectsRepo.update(userId, id, input);
     await writeAudit({
       userId,
-      action: "project.updated",
-      entityType: "project",
+      action: 'project.updated',
+      entityType: 'project',
       entityId: id,
       metadata: {
         nameChanged: before.name !== input.name,
@@ -168,23 +160,20 @@ export const projectsService = {
 
 ```typescript
 // src/actions/projects.ts
-"use server";
-import { withAuth } from "@/lib/auth/with-auth";
-import { updateProjectSchema } from "@/lib/schemas/project.schema";
-import { projectsService } from "@/lib/services/projects.service";
-import { revalidatePath } from "next/cache";
+'use server';
+import { withAuth } from '@/lib/auth/with-auth';
+import { updateProjectSchema } from '@/lib/schemas/project.schema';
+import { projectsService } from '@/lib/services/projects.service';
+import { revalidatePath } from 'next/cache';
 
-export const updateProject = withAuth(
-  updateProjectSchema,
-  async (userId, input) => {
-    const project = await projectsService.rename(userId, input.id, {
-      name: input.name,
-      description: input.description ?? null,
-    });
-    revalidatePath(`/projects/${input.id}`);
-    return project;
-  }
-);
+export const updateProject = withAuth(updateProjectSchema, async (userId, input) => {
+  const project = await projectsService.rename(userId, input.id, {
+    name: input.name,
+    description: input.description ?? null,
+  });
+  revalidatePath(`/projects/${input.id}`);
+  return project;
+});
 ```
 
 The chain has authorization checks at each level. The action wrapper supplies `userId`. The service function passes `userId` through. The repository function injects `userId` into every Prisma where clause. A request from user A trying to rename user B's project finds `result.count === 0` in the repo, throws `PROJECT_NOT_FOUND`, and the action returns `{ ok: false, error: "PROJECT_NOT_FOUND" }`. No row of user B's was read or written.

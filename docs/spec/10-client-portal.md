@@ -125,12 +125,12 @@ The portal has a dedicated route segment outside `(app)` and outside the marketi
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `requestClientMagicLink` | `{ clientId }` (authenticated, freelancer) | `{ ok: true }` | Issues token, hashes, inserts session, emails. Writes audit `client.magic-link-issued`. |
-| `requestClientMagicLinkPublic` | `{ email }` (no auth) | `{ ok: true }` | For each matching client across freelancers, issues a link. Always returns success. Rate-limited. |
-| `verifyClientMagicLink` | `{ token }` (no auth, called by route handler) | `{ ok: true, redirect: "/portal" }` | Hashes token, validates session, marks consumed, sets cookie. |
-| `clientLogout` | `{}` (cookie auth) | `{ ok: true }` | Sets `sessionExpiresAt = now`; clears cookie. |
+| Action                         | Input                                          | Output                              | Side effects                                                                                      |
+| ------------------------------ | ---------------------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `requestClientMagicLink`       | `{ clientId }` (authenticated, freelancer)     | `{ ok: true }`                      | Issues token, hashes, inserts session, emails. Writes audit `client.magic-link-issued`.           |
+| `requestClientMagicLinkPublic` | `{ email }` (no auth)                          | `{ ok: true }`                      | For each matching client across freelancers, issues a link. Always returns success. Rate-limited. |
+| `verifyClientMagicLink`        | `{ token }` (no auth, called by route handler) | `{ ok: true, redirect: "/portal" }` | Hashes token, validates session, marks consumed, sets cookie.                                     |
+| `clientLogout`                 | `{}` (cookie auth)                             | `{ ok: true }`                      | Sets `sessionExpiresAt = now`; clears cookie.                                                     |
 
 ## Repository Functions
 

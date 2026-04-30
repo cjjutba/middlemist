@@ -44,7 +44,7 @@ jobs:
           POSTGRES_USER: middlemist
           POSTGRES_PASSWORD: middlemist
           POSTGRES_DB: middlemist_test
-        ports: ["5432:5432"]
+        ports: ['5432:5432']
         options: >-
           --health-cmd pg_isready
           --health-interval 5s
@@ -64,7 +64,7 @@ jobs:
       INNGEST_EVENT_KEY: dummy
       INNGEST_SIGNING_KEY: dummy
       EXCHANGERATE_HOST_KEY: dummy
-      DISABLE_RATE_LIMITS: "true"
+      DISABLE_RATE_LIMITS: 'true'
       NEXT_PUBLIC_APP_URL: http://localhost:3000
       NEXT_PUBLIC_PLAUSIBLE_DOMAIN: middlemist.app
       NEXT_PUBLIC_UPLOADTHING_PUBLIC_URL: https://utfs.io
@@ -123,7 +123,7 @@ name: E2E
 
 on:
   schedule:
-    - cron: "0 5 * * *" # 05:00 UTC nightly
+    - cron: '0 5 * * *' # 05:00 UTC nightly
   workflow_dispatch: {}
 
 jobs:
@@ -137,7 +137,7 @@ jobs:
           POSTGRES_USER: middlemist
           POSTGRES_PASSWORD: middlemist
           POSTGRES_DB: middlemist_e2e
-        ports: ["5432:5432"]
+        ports: ['5432:5432']
         options: >-
           --health-cmd pg_isready
           --health-interval 5s
@@ -148,7 +148,7 @@ jobs:
       DATABASE_URL: postgresql://middlemist:middlemist@localhost:5432/middlemist_e2e
       AUTH_SECRET: ${{ secrets.CI_AUTH_SECRET }}
       # ... other env vars matching ci.yml ...
-      DISABLE_RATE_LIMITS: "true"
+      DISABLE_RATE_LIMITS: 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -185,7 +185,7 @@ On failure, the trace artifacts are uploaded so the operator can replay the fail
 
 ## Branch protection
 
-Configured at *Repo Settings → Branches → Branch protection rule for `main`*:
+Configured at _Repo Settings → Branches → Branch protection rule for `main`_:
 
 - Require a pull request before merging.
 - Require status checks to pass before merging: `ci`.
@@ -197,12 +197,12 @@ The "do not allow bypassing" setting includes administrators. The author admins 
 
 ## Secrets in CI
 
-Stored at *Repo Settings → Secrets and variables → Actions*:
+Stored at _Repo Settings → Secrets and variables → Actions_:
 
-| Secret | Use |
-|---|---|
+| Secret           | Use                        |
+| ---------------- | -------------------------- |
 | `CI_AUTH_SECRET` | Auth.js signing for tests. |
-| `CI_CRON_SECRET` | Cron secret for tests. |
+| `CI_CRON_SECRET` | Cron secret for tests.     |
 
 That is the complete list for v1 CI. Tests do not call live providers; dummy values cover the rest.
 

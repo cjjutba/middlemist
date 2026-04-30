@@ -12,30 +12,30 @@ The decision to use Inngest over BullMQ + Redis is captured in ADR 0004. The sho
 
 ## Cron jobs
 
-| Name | Schedule | Purpose |
-|---|---|---|
-| `fx.refresh` | daily 06:00 UTC | Fetch latest rates from exchangerate.host and upsert into `FxRate`. |
-| `invoices.check-overdue` | hourly | Find sent invoices past `dueDate`, mark `status = overdue`, write audit + notification. |
-| `invoices.send-reminders` | hourly | For each user's `InvoiceReminderConfig`, find invoices matching `daysBeforeDue` or `daysAfterDue` and send reminder emails. |
-| `proposals.check-expired` | hourly | Find sent proposals past `validUntil`, mark `status = expired`, write audit. |
-| `audit.compact` | weekly Sun 02:00 UTC | Compress audit log entries older than 90 days into summary rows; delete soft-deleted file metadata older than 30 days. |
+| Name                      | Schedule             | Purpose                                                                                                                     |
+| ------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `fx.refresh`              | daily 06:00 UTC      | Fetch latest rates from exchangerate.host and upsert into `FxRate`.                                                         |
+| `invoices.check-overdue`  | hourly               | Find sent invoices past `dueDate`, mark `status = overdue`, write audit + notification.                                     |
+| `invoices.send-reminders` | hourly               | For each user's `InvoiceReminderConfig`, find invoices matching `daysBeforeDue` or `daysAfterDue` and send reminder emails. |
+| `proposals.check-expired` | hourly               | Find sent proposals past `validUntil`, mark `status = expired`, write audit.                                                |
+| `audit.compact`           | weekly Sun 02:00 UTC | Compress audit log entries older than 90 days into summary rows; delete soft-deleted file metadata older than 30 days.      |
 
 Cron handlers idempotently process work: each one reads the current state, advances rows that need advancing, and is safe to run twice in the same window without duplicating side effects. For example, `invoices.check-overdue` only acts on rows whose status is currently `sent`; running it twice does not double-mark.
 
 ## Event-driven jobs
 
-| Event | Triggered by | Effects |
-|---|---|---|
-| `user.signup` | Successful signup completion | Send welcome email; seed `EmailSettings` and `InvoiceReminderConfig` defaults. |
-| `proposal.sent` | `sendProposal` action | Email client with proposal link; write audit. |
-| `proposal.viewed` | First public-link page view | Email freelancer (if enabled); insert audit + notification; set `Proposal.viewedAt`. |
-| `proposal.accepted` | Public accept action | Email freelancer; create or attach project (draft); write audit + notification. |
-| `proposal.declined` | Public decline action | Email freelancer; write audit + notification. |
-| `invoice.sent` | `sendInvoice` action | Email client with invoice link; write audit. |
-| `invoice.viewed` | First public-link page view | Email freelancer (if enabled); insert audit + notification; set `Invoice.viewedAt`. |
-| `invoice.paid` | `markInvoicePaid` action | Email freelancer (confirmation); write audit + notification. |
-| `update.posted` | `postUpdate` action (when "send email" toggled) | Render React Email; send to client; set `Update.emailSentAt`. |
-| `client.magic-link-requested` | Portal access request | Generate token, store hash, email client. |
+| Event                         | Triggered by                                    | Effects                                                                              |
+| ----------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `user.signup`                 | Successful signup completion                    | Send welcome email; seed `EmailSettings` and `InvoiceReminderConfig` defaults.       |
+| `proposal.sent`               | `sendProposal` action                           | Email client with proposal link; write audit.                                        |
+| `proposal.viewed`             | First public-link page view                     | Email freelancer (if enabled); insert audit + notification; set `Proposal.viewedAt`. |
+| `proposal.accepted`           | Public accept action                            | Email freelancer; create or attach project (draft); write audit + notification.      |
+| `proposal.declined`           | Public decline action                           | Email freelancer; write audit + notification.                                        |
+| `invoice.sent`                | `sendInvoice` action                            | Email client with invoice link; write audit.                                         |
+| `invoice.viewed`              | First public-link page view                     | Email freelancer (if enabled); insert audit + notification; set `Invoice.viewedAt`.  |
+| `invoice.paid`                | `markInvoicePaid` action                        | Email freelancer (confirmation); write audit + notification.                         |
+| `update.posted`               | `postUpdate` action (when "send email" toggled) | Render React Email; send to client; set `Update.emailSentAt`.                        |
+| `client.magic-link-requested` | Portal access request                           | Generate token, store hash, email client.                                            |
 
 Application code does not perform email or notification side effects synchronously. The action writes the row, fires the event, and returns. The handler does the rest. This keeps the request fast, retries are free, and the failure mode of "email service is down" does not block the user.
 
@@ -45,12 +45,12 @@ Payloads are minimal. They carry IDs, not full objects. Handlers re-fetch from t
 
 ```typescript
 // good
-inngest.send({ name: "proposal.viewed", data: { proposalId: "clx..." } });
+inngest.send({ name: 'proposal.viewed', data: { proposalId: 'clx...' } });
 
 // bad: payload could be stale by the time the handler runs
 inngest.send({
-  name: "proposal.viewed",
-  data: { proposalId: "clx...", title, total, status },
+  name: 'proposal.viewed',
+  data: { proposalId: 'clx...', title, total, status },
 });
 ```
 
@@ -59,24 +59,24 @@ The handler:
 ```typescript
 // src/lib/inngest/functions/proposal-viewed.ts
 
-import { inngest } from "@/lib/inngest/client";
-import { prisma } from "@/lib/prisma";
+import { inngest } from '@/lib/inngest/client';
+import { prisma } from '@/lib/prisma';
 
 export const onProposalViewed = inngest.createFunction(
-  { id: "proposal-viewed" },
-  { event: "proposal.viewed" },
+  { id: 'proposal-viewed' },
+  { event: 'proposal.viewed' },
   async ({ event, step }) => {
     const { proposalId } = event.data;
 
-    const proposal = await step.run("load-proposal", async () =>
+    const proposal = await step.run('load-proposal', async () =>
       prisma.proposal.findUnique({
         where: { id: proposalId },
         include: { user: true, client: true },
-      })
+      }),
     );
-    if (!proposal) return { skipped: "not-found" };
+    if (!proposal) return { skipped: 'not-found' };
 
-    await step.run("set-viewed-at", async () => {
+    await step.run('set-viewed-at', async () => {
       if (proposal.viewedAt) return;
       await prisma.proposal.update({
         where: { id: proposal.id },
@@ -84,12 +84,12 @@ export const onProposalViewed = inngest.createFunction(
       });
     });
 
-    await step.run("send-notification-email", async () => {
+    await step.run('send-notification-email', async () => {
       // sendEmail(...) see email-system.md
     });
 
     return { ok: true };
-  }
+  },
 );
 ```
 
@@ -136,18 +136,18 @@ src/lib/inngest/
 
 ```typescript
 // src/lib/inngest/client.ts
-import { Inngest } from "inngest";
+import { Inngest } from 'inngest';
 
 type EventMap = {
-  "proposal.viewed": { data: { proposalId: string } };
-  "invoice.paid": { data: { invoiceId: string; amount: number } };
+  'proposal.viewed': { data: { proposalId: string } };
+  'invoice.paid': { data: { invoiceId: string; amount: number } };
   // ... rest of the events
 };
 
 export const inngest = new Inngest({
-  id: "middlemist",
+  id: 'middlemist',
   schemas: {
-    "proposal.viewed": { data: { proposalId: "string" } },
+    'proposal.viewed': { data: { proposalId: 'string' } },
     // ...
   } as unknown as EventMap,
 });
@@ -155,9 +155,9 @@ export const inngest = new Inngest({
 
 ```typescript
 // src/app/api/inngest/route.ts
-import { serve } from "inngest/next";
-import { inngest } from "@/lib/inngest/client";
-import { functions } from "@/lib/inngest/functions";
+import { serve } from 'inngest/next';
+import { inngest } from '@/lib/inngest/client';
+import { functions } from '@/lib/inngest/functions';
 
 export const { GET, POST, PUT } = serve({ client: inngest, functions });
 ```
@@ -180,11 +180,11 @@ Cron and event handlers are tested with Vitest:
 - **End-to-end** flows are tested with the Inngest test helper, which lets you `await` a function's run with a fake event:
 
 ```typescript
-import { describe, it, expect } from "vitest";
-import { onProposalViewed } from "@/lib/inngest/functions/proposal-viewed";
+import { describe, it, expect } from 'vitest';
+import { onProposalViewed } from '@/lib/inngest/functions/proposal-viewed';
 
-describe("proposal.viewed handler", () => {
-  it("sets viewedAt only on first view", async () => {
+describe('proposal.viewed handler', () => {
+  it('sets viewedAt only on first view', async () => {
     // seed a proposal with viewedAt = null
     // run the handler with an event payload
     // assert viewedAt is now set

@@ -33,15 +33,15 @@ The two flows share the URL-as-credential threat model. They differ in how singl
 
 ```typescript
 // src/lib/auth/portal-tokens.ts
-import { customAlphabet } from "nanoid";
-import { createHash } from "node:crypto";
+import { customAlphabet } from 'nanoid';
+import { createHash } from 'node:crypto';
 
-const URL_SAFE = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
+const URL_SAFE = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-';
 const generateToken = customAlphabet(URL_SAFE, 48);
 
 export function newPortalToken() {
   const token = generateToken();
-  const hash = createHash("sha256").update(token).digest("hex");
+  const hash = createHash('sha256').update(token).digest('hex');
   return { token, hash };
 }
 ```
@@ -89,10 +89,10 @@ No table. The token is a JWT; the only persistent state is `User.passwordVersion
 
 ```typescript
 // src/actions/portal.ts (excerpt; fully wrapped per docs/engineering/server-actions.md)
-"use server";
-import { newPortalToken } from "@/lib/auth/portal-tokens";
-import { clientPortalRepo } from "@/lib/repositories/client-portal.repo";
-import { inngest } from "@/lib/inngest/client";
+'use server';
+import { newPortalToken } from '@/lib/auth/portal-tokens';
+import { clientPortalRepo } from '@/lib/repositories/client-portal.repo';
+import { inngest } from '@/lib/inngest/client';
 
 export const issuePortalLink = withAuth(
   z.object({ clientId: z.string() }),
@@ -100,11 +100,11 @@ export const issuePortalLink = withAuth(
     const { token, hash } = newPortalToken();
     await clientPortalRepo.issue(userId, clientId, hash, /* ttl */ 60 * 60);
     await inngest.send({
-      name: "client.magic-link-requested",
+      name: 'client.magic-link-requested',
       data: { userId, clientId, token },
     });
     return { ok: true };
-  }
+  },
 );
 ```
 
@@ -112,47 +112,44 @@ The Inngest handler renders the email template (`magic-link.tsx`) using the plai
 
 ```typescript
 // src/app/portal/[token]/route.ts (Route Handler)
-import { createHash } from "node:crypto";
-import { cookies, headers } from "next/headers";
-import { clientPortalRepo } from "@/lib/repositories/client-portal.repo";
-import { writeAudit } from "@/lib/audit/write";
-import { redirect } from "next/navigation";
+import { createHash } from 'node:crypto';
+import { cookies, headers } from 'next/headers';
+import { clientPortalRepo } from '@/lib/repositories/client-portal.repo';
+import { writeAudit } from '@/lib/audit/write';
+import { redirect } from 'next/navigation';
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ token: string }> }
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  const hash = createHash("sha256").update(token).digest("hex");
+  const hash = createHash('sha256').update(token).digest('hex');
   const session = await clientPortalRepo.findByHashForRedeem(hash);
-  if (!session) redirect("/portal/expired");
-  if (session.consumedAt) redirect("/portal/already-used");
-  if (session.magicLinkExpiresAt < new Date()) redirect("/portal/expired");
+  if (!session) redirect('/portal/expired');
+  if (session.consumedAt) redirect('/portal/already-used');
+  if (session.magicLinkExpiresAt < new Date()) redirect('/portal/expired');
 
   const h = await headers();
   const ctx = await clientPortalRepo.consumeAndIssueSession(session.id, {
-    ip: h.get("x-forwarded-for") ?? undefined,
-    userAgent: h.get("user-agent") ?? undefined,
+    ip: h.get('x-forwarded-for') ?? undefined,
+    userAgent: h.get('user-agent') ?? undefined,
   });
 
   await writeAudit({
     userId: session.userId,
-    action: "client.portal-redeemed",
-    entityType: "client",
+    action: 'client.portal-redeemed',
+    entityType: 'client',
     entityId: session.clientId,
     metadata: {},
   });
 
   const c = await cookies();
-  c.set("middlemist.portal", ctx.cookieValue, {
+  c.set('middlemist.portal', ctx.cookieValue, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
     expires: ctx.sessionExpiresAt,
-    path: "/portal",
+    path: '/portal',
   });
 
-  redirect("/portal");
+  redirect('/portal');
 }
 ```
 
@@ -165,8 +162,8 @@ See `docs/security/authentication.md` for the full flow. The verifier:
 ```typescript
 // src/lib/auth/tokens.ts (excerpt)
 export async function verifyPasswordResetToken(token: string) {
-  const { payload } = await jwtVerify(token, secret, { algorithms: ["HS256"] });
-  if (payload.purpose !== "password-reset") throw new Error("WRONG_PURPOSE");
+  const { payload } = await jwtVerify(token, secret, { algorithms: ['HS256'] });
+  if (payload.purpose !== 'password-reset') throw new Error('WRONG_PURPOSE');
   return {
     userId: payload.userId as string,
     passwordVersion: payload.passwordVersion as number,
@@ -174,7 +171,7 @@ export async function verifyPasswordResetToken(token: string) {
 }
 ```
 
-The redeemer reads the user, checks `payload.passwordVersion === user.passwordVersion`, and only then permits the password update. The bump happens *inside* the same transaction that updates `passwordHash`, so a second concurrent click hits a stale version and is rejected.
+The redeemer reads the user, checks `payload.passwordVersion === user.passwordVersion`, and only then permits the password update. The bump happens _inside_ the same transaction that updates `passwordHash`, so a second concurrent click hits a stale version and is rejected.
 
 ## Email template
 
@@ -232,7 +229,7 @@ There is no manual "revoke this magic link" UI. Magic links revoke themselves th
 
 A freelancer can revoke a portal session from the client's settings page. The action sets `sessionExpiresAt = now`. The next request from the cookie fails the `sessionExpiresAt > now` check and the client is logged out. The revocation writes audit `client.portal-revoked`.
 
-If the freelancer wants to revoke *all* portal sessions for a client at once, the same action can be batched: `UPDATE ClientPortalSession SET sessionExpiresAt = now WHERE userId = $u AND clientId = $c`.
+If the freelancer wants to revoke _all_ portal sessions for a client at once, the same action can be batched: `UPDATE ClientPortalSession SET sessionExpiresAt = now WHERE userId = $u AND clientId = $c`.
 
 ### Password reset
 
@@ -242,7 +239,7 @@ Revoke = bump `passwordVersion`. The bump happens automatically on every success
 
 ```typescript
 // src/lib/repositories/client-portal.repo.ts (excerpt)
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export const clientPortalRepo = {
   async issue(userId: string, clientId: string, tokenHash: string, ttlSeconds: number) {
@@ -270,10 +267,7 @@ export const clientPortalRepo = {
     });
   },
 
-  async consumeAndIssueSession(
-    sessionId: string,
-    meta: { ip?: string; userAgent?: string }
-  ) {
+  async consumeAndIssueSession(sessionId: string, meta: { ip?: string; userAgent?: string }) {
     const sessionExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const updated = await prisma.clientPortalSession.update({
       where: { id: sessionId },

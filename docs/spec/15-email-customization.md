@@ -84,9 +84,9 @@ States: loading (preview placeholder), error (form-level banner), unsaved-change
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `updateEmailTemplate` | `{ templateKey, subject?, body? }` | `{ ok: true }` | Writes the override columns; null clears. Writes audit `user.email-template-updated`. |
+| Action                 | Input                                                | Output                                 | Side effects                                                                            |
+| ---------------------- | ---------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------- |
+| `updateEmailTemplate`  | `{ templateKey, subject?, body? }`                   | `{ ok: true }`                         | Writes the override columns; null clears. Writes audit `user.email-template-updated`.   |
 | `previewEmailTemplate` | `{ templateKey, subject, body }` (uncommitted draft) | `{ ok: true, data: { html: string } }` | Renders the template with sample fixture data and the supplied subject/body. Read-only. |
 
 The `updateEmailSettings` action (covering fromName, replyTo, signatureMd) is in [12-settings](./12-settings.md).

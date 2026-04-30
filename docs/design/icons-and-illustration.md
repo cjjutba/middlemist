@@ -12,18 +12,18 @@ The icon family is **Lucide React**. It is already in the stack and has the righ
 
 Lucide icons render at three standard sizes:
 
-| Size | Use |
-|---|---|
+| Size | Use                                                                                      |
+| ---- | ---------------------------------------------------------------------------------------- |
 | 16px | Inline with `{typography.body-sm}` (button labels, small buttons, table cell adornments) |
-| 20px | Inline with `{typography.body-md}` (default UI icons, sidebar items, dropdown rows) |
-| 24px | Larger UI accents (feature icon card titles, modal headers) |
+| 20px | Inline with `{typography.body-md}` (default UI icons, sidebar items, dropdown rows)      |
+| 24px | Larger UI accents (feature icon card titles, modal headers)                              |
 
 Stroke width is **1.5** at all sizes. The default Lucide stroke is 2; lowering it to 1.5 reads as more refined and matches Cal.com's character. Set the stroke globally:
 
 ```tsx
-import { Icon as LucideIcon } from "lucide-react";
+import { Icon as LucideIcon } from 'lucide-react';
 
-<LucideIcon name="search" size={20} strokeWidth={1.5} />
+<LucideIcon name="search" size={20} strokeWidth={1.5} />;
 ```
 
 Or apply via CSS:
@@ -88,7 +88,10 @@ Specifications:
 The wordmark is rendered as text in HTML, not as an SVG asset, so it scales freely and inherits color via CSS. The circle is a simple `<span>` with rounded corners.
 
 ```tsx
-<a href="/" className="inline-flex items-center gap-2 font-display text-[18px] font-semibold text-ink">
+<a
+  href="/"
+  className="font-display text-ink inline-flex items-center gap-2 text-[18px] font-semibold"
+>
   <span className="size-3 rounded-full bg-current" />
   middlemist
 </a>
@@ -97,7 +100,10 @@ The wordmark is rendered as text in HTML, not as an SVG asset, so it scales free
 The same component on a dark surface inherits white through `text-on-dark`:
 
 ```tsx
-<a href="/" className="inline-flex items-center gap-2 font-display text-[18px] font-semibold text-on-dark">
+<a
+  href="/"
+  className="font-display text-on-dark inline-flex items-center gap-2 text-[18px] font-semibold"
+>
   <span className="size-3 rounded-full bg-current" />
   middlemist
 </a>

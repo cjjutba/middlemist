@@ -578,27 +578,27 @@ A magic-link issuance and redemption record. `tokenHash` is `sha256(token)`. `ma
 
 ## Multi-tenant ownership
 
-| Table | Ownership |
-|---|---|
-| User | itself |
-| Client | direct `userId` |
-| Project | direct `userId` |
-| Task | direct `userId` |
-| TimeEntry | direct `userId` |
-| Update | direct `userId` |
-| UpdateAttachment | indirect via Update |
-| Proposal | direct `userId` |
-| SavedBlock | direct `userId` |
-| SavedPricingItem | direct `userId` |
-| ProposalTemplate | direct `userId` |
-| Invoice | direct `userId` |
-| InvoiceLineItem | indirect via Invoice |
-| FxRate | global (no tenancy) |
-| EmailSettings | direct `userId` (1:1 with User) |
-| InvoiceReminderConfig | direct `userId` (1:1 with User) |
-| AuditLog | direct `userId` (nullable for unauth events) |
-| NotificationRead | direct `userId` |
-| ClientPortalSession | direct `userId` and `clientId` |
+| Table                 | Ownership                                    |
+| --------------------- | -------------------------------------------- |
+| User                  | itself                                       |
+| Client                | direct `userId`                              |
+| Project               | direct `userId`                              |
+| Task                  | direct `userId`                              |
+| TimeEntry             | direct `userId`                              |
+| Update                | direct `userId`                              |
+| UpdateAttachment      | indirect via Update                          |
+| Proposal              | direct `userId`                              |
+| SavedBlock            | direct `userId`                              |
+| SavedPricingItem      | direct `userId`                              |
+| ProposalTemplate      | direct `userId`                              |
+| Invoice               | direct `userId`                              |
+| InvoiceLineItem       | indirect via Invoice                         |
+| FxRate                | global (no tenancy)                          |
+| EmailSettings         | direct `userId` (1:1 with User)              |
+| InvoiceReminderConfig | direct `userId` (1:1 with User)              |
+| AuditLog              | direct `userId` (nullable for unauth events) |
+| NotificationRead      | direct `userId`                              |
+| ClientPortalSession   | direct `userId` and `clientId`               |
 
 Indirect-ownership tables are queried only via the parent's repository; they never get a top-level repository function.
 

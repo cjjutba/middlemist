@@ -13,29 +13,29 @@ The decision frame is "pick a stack now and stick with it." Late-game stack chan
 
 The stack:
 
-| Layer | Choice |
-|---|---|
-| Framework | Next.js 15 App Router |
-| Language | TypeScript (strict) |
-| Database | PostgreSQL via Neon |
-| ORM | Prisma 6 |
-| Auth | Auth.js v5 (NextAuth) |
-| Background jobs | Inngest |
-| Email | Resend + React Email |
-| Files | UploadThing |
-| PDF | `@react-pdf/renderer` |
-| Rate limiting | Upstash Ratelimit |
-| Components | shadcn/ui (heavily themed) |
-| Editor | Tiptap v2 |
-| Forms | react-hook-form + zod |
-| Validation | zod (shared client/server) |
-| Search | Postgres `pg_trgm` |
-| Hosting | Vercel |
-| Package manager | pnpm |
-| Testing | Vitest + Playwright |
-| Error tracking | Sentry |
-| Analytics | Plausible |
-| FX | exchangerate.host |
+| Layer           | Choice                     |
+| --------------- | -------------------------- |
+| Framework       | Next.js 15 App Router      |
+| Language        | TypeScript (strict)        |
+| Database        | PostgreSQL via Neon        |
+| ORM             | Prisma 6                   |
+| Auth            | Auth.js v5 (NextAuth)      |
+| Background jobs | Inngest                    |
+| Email           | Resend + React Email       |
+| Files           | UploadThing                |
+| PDF             | `@react-pdf/renderer`      |
+| Rate limiting   | Upstash Ratelimit          |
+| Components      | shadcn/ui (heavily themed) |
+| Editor          | Tiptap v2                  |
+| Forms           | react-hook-form + zod      |
+| Validation      | zod (shared client/server) |
+| Search          | Postgres `pg_trgm`         |
+| Hosting         | Vercel                     |
+| Package manager | pnpm                       |
+| Testing         | Vitest + Playwright        |
+| Error tracking  | Sentry                     |
+| Analytics       | Plausible                  |
+| FX              | exchangerate.host          |
 
 The picks share two properties: serverless-friendly and TypeScript-native. The result is a single repository, a single deploy target, a single set of types from the database to the client form.
 

@@ -36,15 +36,15 @@ The pyramid:
 
 Pragmatic, not absolute. The targets reflect "what we need to prove" rather than "what we can measure."
 
-| Layer | Target | Rationale |
-|---|---|---|
-| Repositories | ~80% line coverage; **every public function has a multi-tenant isolation test** | Tenancy is the property that matters; coverage tracks the proof. |
-| Services | ~60% | Business rules vary in importance; cover the state transitions and the integration boundaries. |
-| Server actions | ~40% (smoke) | The wrapper handles the bulk; per-action smoke tests verify the wrapper catches the right errors. |
-| UI components | very little | Only critical interactives (proposal editor, time tracker) get unit tests. Visual correctness is not asserted in v1 (no snapshot tests on rendered components). |
-| Email templates | snapshot per template | Catches accidental layout regressions. |
-| PDFs | golden-file tests | Render to a file and compare against a checked-in PDF (byte-equal). |
-| Inngest functions | per-function happy-path + idempotency test | Idempotency is testable: run the handler twice, assert end state matches running once. |
+| Layer             | Target                                                                          | Rationale                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repositories      | ~80% line coverage; **every public function has a multi-tenant isolation test** | Tenancy is the property that matters; coverage tracks the proof.                                                                                                |
+| Services          | ~60%                                                                            | Business rules vary in importance; cover the state transitions and the integration boundaries.                                                                  |
+| Server actions    | ~40% (smoke)                                                                    | The wrapper handles the bulk; per-action smoke tests verify the wrapper catches the right errors.                                                               |
+| UI components     | very little                                                                     | Only critical interactives (proposal editor, time tracker) get unit tests. Visual correctness is not asserted in v1 (no snapshot tests on rendered components). |
+| Email templates   | snapshot per template                                                           | Catches accidental layout regressions.                                                                                                                          |
+| PDFs              | golden-file tests                                                               | Render to a file and compare against a checked-in PDF (byte-equal).                                                                                             |
+| Inngest functions | per-function happy-path + idempotency test                                      | Idempotency is testable: run the handler twice, assert end state matches running once.                                                                          |
 
 Coverage is reported by Vitest's `--coverage` flag; the report is logged in CI but not enforced as a gate. An action without tests does not block merge if it is a thin wrapper around a tested service; review judges case by case.
 
@@ -54,14 +54,14 @@ The single most important test pattern. Every repository function gets one. The 
 
 ```typescript
 // src/lib/repositories/__tests__/projects.repo.test.ts
-import { describe, it, expect, beforeEach } from "vitest";
-import { prisma } from "@/lib/prisma";
-import { projectsRepo } from "../projects.repo";
-import { userFactory } from "tests/factories/user.factory";
-import { clientFactory } from "tests/factories/client.factory";
-import { projectFactory } from "tests/factories/project.factory";
+import { describe, it, expect, beforeEach } from 'vitest';
+import { prisma } from '@/lib/prisma';
+import { projectsRepo } from '../projects.repo';
+import { userFactory } from 'tests/factories/user.factory';
+import { clientFactory } from 'tests/factories/client.factory';
+import { projectFactory } from 'tests/factories/project.factory';
 
-describe("projectsRepo (multi-tenant isolation)", () => {
+describe('projectsRepo (multi-tenant isolation)', () => {
   let userA: string;
   let userB: string;
 
@@ -76,8 +76,8 @@ describe("projectsRepo (multi-tenant isolation)", () => {
     const clientA = await clientFactory({ userId: userA });
     const clientB = await clientFactory({ userId: userB });
 
-    await projectFactory({ userId: userA, clientId: clientA.id, name: "Site redesign" });
-    await projectFactory({ userId: userB, clientId: clientB.id, name: "Site redesign" });
+    await projectFactory({ userId: userA, clientId: clientA.id, name: 'Site redesign' });
+    await projectFactory({ userId: userB, clientId: clientB.id, name: 'Site redesign' });
   });
 
   it("list returns only the calling user's projects", async () => {
@@ -85,21 +85,21 @@ describe("projectsRepo (multi-tenant isolation)", () => {
     expect(await projectsRepo.list(userB)).toHaveLength(1);
   });
 
-  it("findById returns null cross-tenant", async () => {
+  it('findById returns null cross-tenant', async () => {
     const bProject = (await prisma.project.findFirst({ where: { userId: userB } }))!;
     expect(await projectsRepo.findById(userA, bProject.id)).toBeNull();
   });
 
-  it("update throws cross-tenant", async () => {
+  it('update throws cross-tenant', async () => {
     const bProject = (await prisma.project.findFirst({ where: { userId: userB } }))!;
-    await expect(
-      projectsRepo.update(userA, bProject.id, { name: "Hijacked" })
-    ).rejects.toThrow("PROJECT_NOT_FOUND");
+    await expect(projectsRepo.update(userA, bProject.id, { name: 'Hijacked' })).rejects.toThrow(
+      'PROJECT_NOT_FOUND',
+    );
   });
 
-  it("archive throws cross-tenant", async () => {
+  it('archive throws cross-tenant', async () => {
     const bProject = (await prisma.project.findFirst({ where: { userId: userB } }))!;
-    await expect(projectsRepo.archive(userA, bProject.id)).rejects.toThrow("PROJECT_NOT_FOUND");
+    await expect(projectsRepo.archive(userA, bProject.id)).rejects.toThrow('PROJECT_NOT_FOUND');
   });
 });
 ```
@@ -112,16 +112,24 @@ Factories per entity in `tests/factories/`. Each factory creates a row with sens
 
 ```typescript
 // tests/factories/project.factory.ts
-import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function projectFactory(overrides: Partial<Prisma.ProjectUncheckedCreateInput>) {
   return prisma.project.create({
     data: {
-      userId: overrides.userId ?? (() => { throw new Error("userId required"); })(),
-      clientId: overrides.clientId ?? (() => { throw new Error("clientId required"); })(),
-      name: "Test project",
-      status: "active",
+      userId:
+        overrides.userId ??
+        (() => {
+          throw new Error('userId required');
+        })(),
+      clientId:
+        overrides.clientId ??
+        (() => {
+          throw new Error('clientId required');
+        })(),
+      name: 'Test project',
+      status: 'active',
       ...overrides,
     },
   });
@@ -146,7 +154,7 @@ services:
       POSTGRES_PASSWORD: middlemist
       POSTGRES_DB: middlemist_test
     ports:
-      - "5433:5432"
+      - '5433:5432'
     volumes:
       - middlemist_pg:/var/lib/postgresql/data
 volumes:
@@ -198,11 +206,11 @@ Mocks use `vi.mock` from Vitest. The mocks live in `tests/mocks/`; tests import 
 
 ```typescript
 // tests/mocks/email.ts
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 export const sendEmailMock = vi.fn();
 
-vi.mock("@/lib/email/send", () => ({
+vi.mock('@/lib/email/send', () => ({
   sendEmail: sendEmailMock,
 }));
 ```

@@ -24,7 +24,7 @@ src/actions/
 Each file's exports are named verbs (`createClient`, `updateProject`, `markInvoicePaid`). The naming convention is consistent enough that import statements read fluently:
 
 ```typescript
-import { createClient, updateClient, archiveClient } from "@/actions/clients";
+import { createClient, updateClient, archiveClient } from '@/actions/clients';
 ```
 
 ## The wrapper
@@ -33,11 +33,11 @@ import { createClient, updateClient, archiveClient } from "@/actions/clients";
 
 ```typescript
 // src/lib/auth/with-auth.ts
-import { auth } from "@/lib/auth/config";
-import { z } from "zod";
-import { limits } from "@/lib/ratelimit";
-import { logger } from "@/lib/log";
-import { isAppError } from "@/lib/utils/errors";
+import { auth } from '@/lib/auth/config';
+import { z } from 'zod';
+import { limits } from '@/lib/ratelimit';
+import { logger } from '@/lib/log';
+import { isAppError } from '@/lib/utils/errors';
 
 export type ActionResult<T> =
   | { ok: true; data: T }
@@ -46,24 +46,24 @@ export type ActionResult<T> =
 export function withAuth<TInput, TOutput>(
   schema: z.ZodSchema<TInput>,
   handler: (userId: string, input: TInput) => Promise<TOutput>,
-  opts: { rateLimit?: keyof typeof limits } = {}
+  opts: { rateLimit?: keyof typeof limits } = {},
 ): (rawInput: unknown) => Promise<ActionResult<TOutput>> {
   return async (rawInput) => {
     const session = await auth();
     if (!session?.user?.id) {
-      return { ok: false, error: "UNAUTHENTICATED" };
+      return { ok: false, error: 'UNAUTHENTICATED' };
     }
 
-    const rl = await limits[opts.rateLimit ?? "serverActionDefault"].limit(session.user.id);
+    const rl = await limits[opts.rateLimit ?? 'serverActionDefault'].limit(session.user.id);
     if (!rl.success) {
-      return { ok: false, error: "RATE_LIMITED" };
+      return { ok: false, error: 'RATE_LIMITED' };
     }
 
     const parsed = schema.safeParse(rawInput);
     if (!parsed.success) {
       return {
         ok: false,
-        error: parsed.error.issues[0]?.message ?? "INVALID_INPUT",
+        error: parsed.error.issues[0]?.message ?? 'INVALID_INPUT',
         issues: parsed.error.issues,
       };
     }
@@ -75,8 +75,8 @@ export function withAuth<TInput, TOutput>(
       if (isAppError(e)) {
         return { ok: false, error: e.code };
       }
-      logger.error({ err: e }, "server action failed");
-      return { ok: false, error: "UNEXPECTED" };
+      logger.error({ err: e }, 'server action failed');
+      return { ok: false, error: 'UNEXPECTED' };
     }
   };
 }
@@ -92,20 +92,20 @@ Every action is `async (input: unknown) => Promise<ActionResult<TData>>`. The `w
 
 ```typescript
 // src/actions/clients.ts
-"use server";
+'use server';
 
-import { revalidatePath } from "next/cache";
-import { withAuth } from "@/lib/auth/with-auth";
+import { revalidatePath } from 'next/cache';
+import { withAuth } from '@/lib/auth/with-auth';
 import {
   createClientSchema,
   updateClientSchema,
   archiveClientSchema,
-} from "@/lib/schemas/client.schema";
-import { clientsService } from "@/lib/services/clients.service";
+} from '@/lib/schemas/client.schema';
+import { clientsService } from '@/lib/services/clients.service';
 
 export const createClient = withAuth(createClientSchema, async (userId, input) => {
   const client = await clientsService.create(userId, input);
-  revalidatePath("/clients");
+  revalidatePath('/clients');
   return client;
 });
 
@@ -113,13 +113,13 @@ export const updateClient = withAuth(updateClientSchema, async (userId, input) =
   const { id, ...rest } = input;
   const client = await clientsService.update(userId, id, rest);
   revalidatePath(`/clients/${id}`);
-  revalidatePath("/clients");
+  revalidatePath('/clients');
   return client;
 });
 
 export const archiveClient = withAuth(archiveClientSchema, async (userId, { id }) => {
   await clientsService.archive(userId, id);
-  revalidatePath("/clients");
+  revalidatePath('/clients');
   return { id };
 });
 ```
@@ -153,7 +153,7 @@ A complete walkthrough of the layers from form submit to UI reload.
 
 ```typescript
 // src/lib/schemas/proposal.schema.ts
-import { z } from "zod";
+import { z } from 'zod';
 
 export const createProposalSchema = z.object({
   clientId: z.string().min(1),
@@ -165,17 +165,17 @@ export type CreateProposalInput = z.infer<typeof createProposalSchema>;
 
 ```typescript
 // src/lib/services/proposals.service.ts (excerpt)
-import { proposalsRepo } from "@/lib/repositories/proposals.repo";
-import { clientsRepo } from "@/lib/repositories/clients.repo";
-import { writeAudit } from "@/lib/audit/write";
-import { inngest } from "@/lib/inngest/client";
-import { NotFoundError } from "@/lib/utils/errors";
-import { newPublicToken } from "@/lib/auth/portal-tokens";
+import { proposalsRepo } from '@/lib/repositories/proposals.repo';
+import { clientsRepo } from '@/lib/repositories/clients.repo';
+import { writeAudit } from '@/lib/audit/write';
+import { inngest } from '@/lib/inngest/client';
+import { NotFoundError } from '@/lib/utils/errors';
+import { newPublicToken } from '@/lib/auth/portal-tokens';
 
 export const proposalsService = {
   async create(userId: string, input: CreateProposalInput) {
     const client = await clientsRepo.findById(userId, input.clientId);
-    if (!client) throw new NotFoundError("CLIENT_NOT_FOUND");
+    if (!client) throw new NotFoundError('CLIENT_NOT_FOUND');
 
     const validUntil = new Date(Date.now() + input.validUntilDays * 24 * 60 * 60 * 1000);
 
@@ -184,13 +184,13 @@ export const proposalsService = {
       title: input.title,
       validUntil,
       publicToken: newPublicToken(),
-      status: "draft",
+      status: 'draft',
     });
 
     await writeAudit({
       userId,
-      action: "proposal.created",
-      entityType: "proposal",
+      action: 'proposal.created',
+      entityType: 'proposal',
       entityId: proposal.id,
       metadata: { clientId: input.clientId, title: input.title },
     });
@@ -202,16 +202,16 @@ export const proposalsService = {
 
 ```typescript
 // src/actions/proposals.ts
-"use server";
+'use server';
 
-import { revalidatePath } from "next/cache";
-import { withAuth } from "@/lib/auth/with-auth";
-import { createProposalSchema } from "@/lib/schemas/proposal.schema";
-import { proposalsService } from "@/lib/services/proposals.service";
+import { revalidatePath } from 'next/cache';
+import { withAuth } from '@/lib/auth/with-auth';
+import { createProposalSchema } from '@/lib/schemas/proposal.schema';
+import { proposalsService } from '@/lib/services/proposals.service';
 
 export const createProposal = withAuth(createProposalSchema, async (userId, input) => {
   const proposal = await proposalsService.create(userId, input);
-  revalidatePath("/proposals");
+  revalidatePath('/proposals');
   return { id: proposal.id };
 });
 ```
@@ -268,15 +268,12 @@ The flow: form validates client-side via `zodResolver`, action validates server-
 `redirect()` from `next/navigation`. Used after a successful action when the natural next step is a different page.
 
 ```typescript
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 
-export const acceptProposalPublic = withPublicRateLimit(
-  acceptProposalSchema,
-  async (input) => {
-    const proposal = await proposalsService.acceptPublic(input);
-    redirect(`/p/${input.token}/accepted`);
-  }
-);
+export const acceptProposalPublic = withPublicRateLimit(acceptProposalSchema, async (input) => {
+  const proposal = await proposalsService.acceptPublic(input);
+  redirect(`/p/${input.token}/accepted`);
+});
 ```
 
 `redirect()` throws a special exception that Next.js catches at the boundary; the function does not return after the call. The action that wraps a redirect has an effective return type of `never` for the success branch, which is fine for navigation flows where the response is the next page rather than a JSON body.
@@ -315,7 +312,7 @@ export const acceptProposalPublic = withPublicRateLimit(
   async (input) => {
     return proposalsService.acceptPublic(input);
   },
-  { rateLimit: "publicView" }
+  { rateLimit: 'publicView' },
 );
 ```
 

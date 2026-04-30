@@ -42,9 +42,9 @@ detect → declare → contain → fix → verify → postmortem
 
 1. Open Vercel status page (`https://vercel-status.com`). If Vercel is degraded, this is platform-level; wait and monitor.
 2. Open Neon status (`https://neonstatus.com`). If Neon is degraded, the database is unreachable; the app will fail. Wait and monitor.
-3. Recent deploys: *Vercel → Project → Deployments*. If a deploy landed within the last 30 minutes, suspect it.
-   - **Action:** Promote the previous deployment via *Promote to Production*. Takes seconds.
-4. Vercel function logs: *Project → Logs*. Filter `level=error`. The most recent errors point at the cause.
+3. Recent deploys: _Vercel → Project → Deployments_. If a deploy landed within the last 30 minutes, suspect it.
+   - **Action:** Promote the previous deployment via _Promote to Production_. Takes seconds.
+4. Vercel function logs: _Project → Logs_. Filter `level=error`. The most recent errors point at the cause.
 5. If the last deploy is older than the symptom and Vercel/Neon are healthy, the cause is likely runtime: the database is full, a connection limit hit, a hung function consuming the concurrency budget.
 
 ### DB down or slow
@@ -55,7 +55,7 @@ detect → declare → contain → fix → verify → postmortem
 
 1. Neon dashboard → Operations. Recent query duration spike?
 2. Connection count near the cap?
-3. Active queries: *Neon → Branch → SQL Editor → `SELECT * FROM pg_stat_activity`*. Long-running queries are visible. Kill stuck queries with `SELECT pg_cancel_backend(pid)`.
+3. Active queries: _Neon → Branch → SQL Editor → `SELECT _ FROM pg_stat_activity`*. Long-running queries are visible. Kill stuck queries with `SELECT pg_cancel_backend(pid)`.
 4. Recent migration: did one apply that introduced a missing index?
 5. Storage limit reached? (Free tier 0.5 GB; the dashboard shows usage.)
 6. **Action paths:**
@@ -69,7 +69,7 @@ detect → declare → contain → fix → verify → postmortem
 
 **Checklist:**
 
-1. Resend dashboard → *Logs*. Filter by `to` or by recent timestamps. Status of the relevant send?
+1. Resend dashboard → _Logs_. Filter by `to` or by recent timestamps. Status of the relevant send?
    - `delivered` → email is fine; recipient may have it in spam.
    - `bounced` → check the bounce reason. The `Client.emailValid` flag should already be false; if not, the webhook may have failed.
    - `queued` for an extended time → Resend is degraded.
@@ -101,7 +101,7 @@ detect → declare → contain → fix → verify → postmortem
 
 1. UploadThing dashboard → Quota. Free tier limit hit?
 2. UploadThing status (`https://status.uploadthing.com`).
-3. `UPLOADTHING_TOKEN` valid? An expired token fails every upload; the env reader does not catch a *valid-shape but inactive* token, only a missing one.
+3. `UPLOADTHING_TOKEN` valid? An expired token fails every upload; the env reader does not catch a _valid-shape but inactive_ token, only a missing one.
 4. UploadThing's `f.middleware` rejecting the upload? Logs in Vercel show the rejection reason (file too large, MIME not allowed, ownership check failed).
 5. **Action paths:**
    - Quota → upgrade plan or cleanup unused files via the soft-delete cron.

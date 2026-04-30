@@ -100,14 +100,14 @@ States across views: loading skeletons inside table rows or kanban cards; error 
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `createTask` | `createTaskSchema` | `{ ok: true, data: { id } }` | Computes position; inserts; writes `task.created` audit. |
-| `updateTask` | `updateTaskSchema` (id + partials) | `{ ok: true, data: Task }` | Updates fields. |
-| `setTaskStatus` | `{ id, status }` | `{ ok: true, data: Task }` | Sets/clears `completedAt`; writes `task.status-changed` audit. |
-| `setTaskPosition` | `{ id, status, position }` | `{ ok: true }` | Recomputes positions for the (projectId, status) bucket. |
-| `deleteTask` | `{ id }` | `{ ok: true }` | Removes row; cascades clear time entry `taskId` references. Writes `task.deleted` audit. |
-| `setTaskClientVisible` | `{ id, clientVisible }` | `{ ok: true }` | Toggles the flag. |
+| Action                 | Input                              | Output                       | Side effects                                                                             |
+| ---------------------- | ---------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------- |
+| `createTask`           | `createTaskSchema`                 | `{ ok: true, data: { id } }` | Computes position; inserts; writes `task.created` audit.                                 |
+| `updateTask`           | `updateTaskSchema` (id + partials) | `{ ok: true, data: Task }`   | Updates fields.                                                                          |
+| `setTaskStatus`        | `{ id, status }`                   | `{ ok: true, data: Task }`   | Sets/clears `completedAt`; writes `task.status-changed` audit.                           |
+| `setTaskPosition`      | `{ id, status, position }`         | `{ ok: true }`               | Recomputes positions for the (projectId, status) bucket.                                 |
+| `deleteTask`           | `{ id }`                           | `{ ok: true }`               | Removes row; cascades clear time entry `taskId` references. Writes `task.deleted` audit. |
+| `setTaskClientVisible` | `{ id, clientVisible }`            | `{ ok: true }`               | Toggles the flag.                                                                        |
 
 ## Repository Functions
 

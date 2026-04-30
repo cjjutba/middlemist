@@ -31,7 +31,7 @@ Performance alerts (a transaction exceeds a P95 threshold) are not configured in
 
 **What it captures.** Real-user performance metrics (largest contentful paint, first input delay, cumulative layout shift) per page. Traffic by country and device. Vercel function execution times.
 
-**Setup.** Enabled in *Project Settings → Analytics*. No code changes; no environment variables.
+**Setup.** Enabled in _Project Settings → Analytics_. No code changes; no environment variables.
 
 **Reading the dashboard.** P75 and P99 of LCP per route. A regression that pushes the dashboard's LCP from 1.4s to 2.2s is visible within an hour. Top slow routes get the next investigation cycle.
 
@@ -45,7 +45,7 @@ Performance alerts (a transaction exceeds a P95 threshold) are not configured in
 
 **Alerts.** Email when a function exceeds 5 consecutive failures (the queue is paused after 3 retries by default; consecutive failures means the input itself is bad). Daily summary email of cron runs.
 
-**Reading the dashboard.** *Functions* lists every registered function. Click a function for its run history. A failed run shows the error and the input; the retry button re-invokes with the same payload. Useful during incident response: a single failed reminder send is fixable in one click.
+**Reading the dashboard.** _Functions_ lists every registered function. Click a function for its run history. A failed run shows the error and the input; the retry button re-invokes with the same payload. Useful during incident response: a single failed reminder send is fixable in one click.
 
 ## Resend
 
@@ -55,7 +55,7 @@ Performance alerts (a transaction exceeds a P95 threshold) are not configured in
 
 **Alerts.** Email when bounce rate exceeds 5% over a rolling 24-hour window. Catches a domain reputation problem early.
 
-**Reading the dashboard.** *Logs* shows individual sends. Filter by `to` to see whether a specific recipient received their email. Filter by status `bounced` to see addresses to follow up on (the bounce webhook also flips `Client.emailValid = false` automatically; the dashboard is the cross-check).
+**Reading the dashboard.** _Logs_ shows individual sends. Filter by `to` to see whether a specific recipient received their email. Filter by status `bounced` to see addresses to follow up on (the bounce webhook also flips `Client.emailValid = false` automatically; the dashboard is the cross-check).
 
 ## Neon
 
@@ -65,7 +65,7 @@ Performance alerts (a transaction exceeds a P95 threshold) are not configured in
 
 **Alerts.** Email when storage approaches the plan's cap (Free tier 0.5 GB, Pro tier higher). Email when compute time approaches the monthly cap on Free tier.
 
-**Reading the dashboard.** *Monitoring → Operations* shows query duration trends. A regression that introduces an N+1 surfaces as a P95 spike on the affected route. *Branches* lists every branch; the production and preview branches should be the only long-lived ones, with feature branches deleted after merge.
+**Reading the dashboard.** _Monitoring → Operations_ shows query duration trends. A regression that introduces an N+1 surfaces as a P95 spike on the affected route. _Branches_ lists every branch; the production and preview branches should be the only long-lived ones, with feature branches deleted after merge.
 
 ## Health check
 
@@ -73,14 +73,14 @@ Performance alerts (a transaction exceeds a P95 threshold) are not configured in
 
 ```typescript
 // src/app/api/health/route.ts
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    return Response.json({ status: "ok" });
+    return Response.json({ status: 'ok' });
   } catch (e) {
-    return Response.json({ status: "error" }, { status: 503 });
+    return Response.json({ status: 'error' }, { status: 503 });
   }
 }
 ```
@@ -93,15 +93,15 @@ A platform-level uptime check (UptimeRobot, Better Stack, or Vercel's built-in m
 
 Email-based alerting from each provider's dashboard. The operator's email inbox is the single notification surface.
 
-| Source | Trigger | Action |
-|---|---|---|
-| Sentry | New issue | Inbox; resolve or suppress within a day. |
-| Sentry | Error spike (>5/hour) | Inbox; investigate immediately. |
-| Resend | Bounce rate > 5% / 24h | Inbox; check domain reputation. |
-| Inngest | 5 consecutive failures on one function | Inbox; check the function and the input. |
-| Neon | Storage cap approaching | Inbox; consider plan upgrade. |
-| Uptime monitor | 3 consecutive failed health checks | Inbox; treat as Sev1 (see `docs/ops/incident-runbook.md`). |
-| Vercel | Build failure on `main` | Inbox; fix the build. |
+| Source         | Trigger                                | Action                                                     |
+| -------------- | -------------------------------------- | ---------------------------------------------------------- |
+| Sentry         | New issue                              | Inbox; resolve or suppress within a day.                   |
+| Sentry         | Error spike (>5/hour)                  | Inbox; investigate immediately.                            |
+| Resend         | Bounce rate > 5% / 24h                 | Inbox; check domain reputation.                            |
+| Inngest        | 5 consecutive failures on one function | Inbox; check the function and the input.                   |
+| Neon           | Storage cap approaching                | Inbox; consider plan upgrade.                              |
+| Uptime monitor | 3 consecutive failed health checks     | Inbox; treat as Sev1 (see `docs/ops/incident-runbook.md`). |
+| Vercel         | Build failure on `main`                | Inbox; fix the build.                                      |
 
 There is no PagerDuty, no on-call rotation, no SMS in v1. The operator's email is the single channel; severity is judged by the trigger and by the runbook.
 

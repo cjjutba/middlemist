@@ -93,7 +93,7 @@ A burst of opens on the same proposal hits the cached page; the row is queried a
 
 ```typescript
 // service: enqueue, do not await delivery
-await inngest.send({ name: "proposal.sent", data: { userId, proposalId } });
+await inngest.send({ name: 'proposal.sent', data: { userId, proposalId } });
 return updated;
 ```
 

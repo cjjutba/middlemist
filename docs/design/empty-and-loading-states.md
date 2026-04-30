@@ -20,13 +20,13 @@ The `{component.empty-state-card}` pattern from `component-patterns.md` carries 
 - **Primary action:** a single `{component.button-primary}` with the canonical action for the entity (e.g., "Add your first client"). No secondary buttons. Empty states are not multi-decision moments.
 
 ```tsx
-<div className="flex flex-col items-center gap-4 px-8 py-12 bg-canvas border border-dashed border-hairline rounded-lg">
+<div className="bg-canvas border-hairline flex flex-col items-center gap-4 rounded-lg border border-dashed px-8 py-12">
   <FolderIcon size={40} strokeWidth={1.5} className="text-muted-soft" />
   <h2 className="text-display-sm text-ink">No projects yet</h2>
-  <p className="max-w-md text-center text-body-md text-muted">
+  <p className="text-body-md text-muted max-w-md text-center">
     Create a project to start tracking work, time, and updates.
   </p>
-  <button className="px-5 py-3 bg-primary text-on-primary text-button rounded-md">
+  <button className="bg-primary text-on-primary text-button rounded-md px-5 py-3">
     New project
   </button>
 </div>
@@ -36,21 +36,21 @@ The `{component.empty-state-card}` pattern from `component-patterns.md` carries 
 
 Each module has a canonical empty-state copy. Use these strings; do not invent new ones at the implementation moment.
 
-| Module | Heading | Description | Action |
-|---|---|---|---|
-| Clients list | "No clients yet" | "Add your first client to start sending proposals." | New client |
-| Projects list | "No projects yet" | "Create a project to start tracking work." | New project |
-| Proposals list | "No proposals yet" | "Build your first proposal in minutes." | New proposal |
-| Invoices list | "No invoices yet" | "Generate an invoice from a project to bill your client." | New invoice |
-| Tasks (per project) | "No tasks yet" | "Break the project into tasks." | New task |
-| Updates (per project) | "No updates yet" | "Post an update to keep your client in the loop." | New update |
-| Time entries (per project) | "No time logged yet" | "Start the timer or log a manual entry." | Log time |
-| Today view | "Nothing due today" | "Enjoy the calm." | (no action) |
-| Search no results | "Nothing matched" | "Try fewer words." | (no action) |
-| Notifications empty | "All caught up" | "Notifications will appear here when there's something new." | (no action) |
-| Saved blocks library | "No saved blocks yet" | "Save a block from any proposal to reuse it later." | (no action) |
-| Saved pricing items | "No saved pricing items yet" | "Save a pricing line from any proposal to reuse it later." | (no action) |
-| Audit log (filtered) | "No matching entries" | "Try a different filter." | (no action) |
+| Module                     | Heading                      | Description                                                  | Action       |
+| -------------------------- | ---------------------------- | ------------------------------------------------------------ | ------------ |
+| Clients list               | "No clients yet"             | "Add your first client to start sending proposals."          | New client   |
+| Projects list              | "No projects yet"            | "Create a project to start tracking work."                   | New project  |
+| Proposals list             | "No proposals yet"           | "Build your first proposal in minutes."                      | New proposal |
+| Invoices list              | "No invoices yet"            | "Generate an invoice from a project to bill your client."    | New invoice  |
+| Tasks (per project)        | "No tasks yet"               | "Break the project into tasks."                              | New task     |
+| Updates (per project)      | "No updates yet"             | "Post an update to keep your client in the loop."            | New update   |
+| Time entries (per project) | "No time logged yet"         | "Start the timer or log a manual entry."                     | Log time     |
+| Today view                 | "Nothing due today"          | "Enjoy the calm."                                            | (no action)  |
+| Search no results          | "Nothing matched"            | "Try fewer words."                                           | (no action)  |
+| Notifications empty        | "All caught up"              | "Notifications will appear here when there's something new." | (no action)  |
+| Saved blocks library       | "No saved blocks yet"        | "Save a block from any proposal to reuse it later."          | (no action)  |
+| Saved pricing items        | "No saved pricing items yet" | "Save a pricing line from any proposal to reuse it later."   | (no action)  |
+| Audit log (filtered)       | "No matching entries"        | "Try a different filter."                                    | (no action)  |
 
 The "no action" states are intentional. Some empty states have nothing for the user to do at this moment — they will fill in over time. Forcing a button on those states reads as nervous.
 
@@ -72,10 +72,10 @@ For full-page or full-section loads, render a skeleton that matches the actual l
 - Skeleton card: same outer shape as the real card, with skeleton content inside
 
 ```tsx
-<div className="p-6 bg-canvas border border-hairline rounded-lg">
-  <div className="h-4 w-3/5 skeleton mb-3 rounded-sm" />
-  <div className="h-3 w-4/5 skeleton mb-2 rounded-sm" />
-  <div className="h-3 w-2/5 skeleton rounded-sm" />
+<div className="bg-canvas border-hairline rounded-lg border p-6">
+  <div className="skeleton mb-3 h-4 w-3/5 rounded-sm" />
+  <div className="skeleton mb-2 h-3 w-4/5 rounded-sm" />
+  <div className="skeleton h-3 w-2/5 rounded-sm" />
 </div>
 ```
 
@@ -88,9 +88,9 @@ For mutations triggered by a button click (Save, Send, Submit), the button itsel
 ```tsx
 <button
   disabled={isSubmitting}
-  className="px-5 py-3 bg-primary text-on-primary text-button rounded-md disabled:opacity-70"
+  className="bg-primary text-on-primary text-button rounded-md px-5 py-3 disabled:opacity-70"
 >
-  {isSubmitting ? <Spinner size={16} /> : "Send proposal"}
+  {isSubmitting ? <Spinner size={16} /> : 'Send proposal'}
 </button>
 ```
 

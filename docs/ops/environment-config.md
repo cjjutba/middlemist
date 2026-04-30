@@ -234,7 +234,7 @@ For dev databases, two patterns:
 
 ## Vercel configuration
 
-In *Project → Settings → Environment Variables*, every variable is set with explicit scope checkboxes:
+In _Project → Settings → Environment Variables_, every variable is set with explicit scope checkboxes:
 
 - **Production** — enabled for the values that production reads.
 - **Preview** — enabled for preview deploy values (often the same secrets but different `DATABASE_URL`, `UPSTASH_REDIS_*`, and `NEXT_PUBLIC_APP_URL`).

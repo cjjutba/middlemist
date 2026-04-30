@@ -109,14 +109,14 @@ The pages below compose the two shells with module-specific content. Each entry 
 
 The system uses Tailwind's default breakpoints with mobile-first defaults.
 
-| Breakpoint | Min width | Use |
-|---|---|---|
-| (default) | 0 | Mobile portrait |
-| sm | 640px | Mobile landscape, small tablet |
-| md | 768px | Tablet portrait |
-| lg | 1024px | Tablet landscape, small desktop |
-| xl | 1280px | Desktop |
-| 2xl | 1536px | Large desktop (rare) |
+| Breakpoint | Min width | Use                             |
+| ---------- | --------- | ------------------------------- |
+| (default)  | 0         | Mobile portrait                 |
+| sm         | 640px     | Mobile landscape, small tablet  |
+| md         | 768px     | Tablet portrait                 |
+| lg         | 1024px    | Tablet landscape, small desktop |
+| xl         | 1280px    | Desktop                         |
+| 2xl        | 1536px    | Large desktop (rare)            |
 
 The most consequential breakpoint is `lg` because it is where the App Shell sidebar collapses. The next most consequential is `md` because it is where data tables become stacked cards and modals lose their padding generosity.
 

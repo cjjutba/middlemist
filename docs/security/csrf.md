@@ -29,10 +29,10 @@ These routes need their own CSRF posture because there is no session cookie to d
 
 ```typescript
 // src/app/p/[token]/accept/route.ts
-import { headers } from "next/headers";
-import { env } from "@/lib/env";
-import { proposalsRepo } from "@/lib/repositories/proposals.repo";
-import { acceptProposalSchema } from "@/lib/schemas/proposal.schema";
+import { headers } from 'next/headers';
+import { env } from '@/lib/env';
+import { proposalsRepo } from '@/lib/repositories/proposals.repo';
+import { acceptProposalSchema } from '@/lib/schemas/proposal.schema';
 
 const APP_HOST = new URL(env.NEXT_PUBLIC_APP_URL).host;
 
@@ -47,15 +47,15 @@ function isValidOrigin(origin: string | null): boolean {
 
 export async function POST(req: Request, { params }: { params: Promise<{ token: string }> }) {
   const h = await headers();
-  if (!isValidOrigin(h.get("origin"))) {
-    return Response.json({ ok: false, error: "BAD_ORIGIN" }, { status: 403 });
+  if (!isValidOrigin(h.get('origin'))) {
+    return Response.json({ ok: false, error: 'BAD_ORIGIN' }, { status: 403 });
   }
 
   const { token } = await params;
   const body = await req.json().catch(() => null);
   const parsed = acceptProposalSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json({ ok: false, error: "INVALID_INPUT" }, { status: 400 });
+    return Response.json({ ok: false, error: 'INVALID_INPUT' }, { status: 400 });
   }
 
   // ... rate-limit, state check, mutation, audit
@@ -74,9 +74,9 @@ Inngest signs every webhook with `INNGEST_SIGNING_KEY`. The Inngest Next.js SDK 
 
 ```typescript
 // src/app/api/inngest/route.ts
-import { serve } from "inngest/next";
-import { inngest } from "@/lib/inngest/client";
-import { fnSendProposal, fnSendInvoice /* ... */ } from "@/lib/inngest/functions";
+import { serve } from 'inngest/next';
+import { inngest } from '@/lib/inngest/client';
+import { fnSendProposal, fnSendInvoice /* ... */ } from '@/lib/inngest/functions';
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
@@ -92,8 +92,8 @@ UploadThing's `createRouteHandler` handles its own auth-and-signature flow:
 
 ```typescript
 // src/app/api/uploadthing/route.ts
-import { createRouteHandler } from "uploadthing/next";
-import { uploadRouter } from "./core";
+import { createRouteHandler } from 'uploadthing/next';
+import { uploadRouter } from './core';
 
 export const { GET, POST } = createRouteHandler({ router: uploadRouter });
 ```
@@ -106,25 +106,25 @@ Resend signs each webhook with `RESEND_WEBHOOK_SECRET` using HMAC-SHA256. Verifi
 
 ```typescript
 // src/app/api/email/webhook/route.ts
-import { createHmac, timingSafeEqual } from "node:crypto";
-import { env } from "@/lib/env";
-import { handleResendEvent } from "@/lib/email/webhook-handler";
+import { createHmac, timingSafeEqual } from 'node:crypto';
+import { env } from '@/lib/env';
+import { handleResendEvent } from '@/lib/email/webhook-handler';
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const signature = req.headers.get("resend-signature");
-  if (!signature) return new Response("missing signature", { status: 401 });
+  const signature = req.headers.get('resend-signature');
+  if (!signature) return new Response('missing signature', { status: 401 });
 
-  const expected = createHmac("sha256", env.RESEND_WEBHOOK_SECRET).update(body).digest("hex");
-  const sigBuf = Buffer.from(signature, "hex");
-  const expBuf = Buffer.from(expected, "hex");
+  const expected = createHmac('sha256', env.RESEND_WEBHOOK_SECRET).update(body).digest('hex');
+  const sigBuf = Buffer.from(signature, 'hex');
+  const expBuf = Buffer.from(expected, 'hex');
   if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) {
-    return new Response("bad signature", { status: 401 });
+    return new Response('bad signature', { status: 401 });
   }
 
   const event = JSON.parse(body);
   await handleResendEvent(event);
-  return new Response("ok");
+  return new Response('ok');
 }
 ```
 

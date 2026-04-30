@@ -76,26 +76,26 @@ Two layers, picked per rule by what the limit's key is.
 
 ## Rules table
 
-| Endpoint / Action | Limit | Window | Key | Layer |
-|---|---|---|---|---|
-| `/login` | 5 | 10 min | IP | middleware |
-| `/login` (per email) | 5 | 10 min | email | server action |
-| `/signup` | 5 | 10 min | IP | middleware |
-| `/forgot-password` | 5 | 10 min | IP | middleware |
-| `/forgot-password` (per email) | 3 | 1 hour | email | server action |
-| `/reset-password/[token]` | 5 | 10 min | IP | middleware |
-| `/verify-email/[token]` | 10 | 10 min | IP | middleware |
-| Resend verification email | 5 | 1 hour | email | server action |
-| `/p/[token]` and `/i/[token]` | 30 | 1 min | token + IP | middleware |
-| `/api/pdf/public/{proposal,invoice}/[token]` | 30 | 1 min | token + IP | middleware |
-| `/portal/[token]` redemption | 10 | 1 min | IP | route handler |
-| Portal magic-link request action | 5 | 1 min | IP | server action |
-| Server actions (default) | 60 | 1 min | userId | server action |
-| Email-sending actions | 10 | 1 hour | userId | server action |
-| Resend invoice reminder action | 5 | 1 hour | userId + invoiceId | server action |
-| File upload actions | 30 | 1 hour | userId | server action |
-| Search action | 60 | 1 min | userId | server action |
-| FX manual refresh action | 1 | 5 min | userId | server action |
+| Endpoint / Action                            | Limit | Window | Key                | Layer         |
+| -------------------------------------------- | ----- | ------ | ------------------ | ------------- |
+| `/login`                                     | 5     | 10 min | IP                 | middleware    |
+| `/login` (per email)                         | 5     | 10 min | email              | server action |
+| `/signup`                                    | 5     | 10 min | IP                 | middleware    |
+| `/forgot-password`                           | 5     | 10 min | IP                 | middleware    |
+| `/forgot-password` (per email)               | 3     | 1 hour | email              | server action |
+| `/reset-password/[token]`                    | 5     | 10 min | IP                 | middleware    |
+| `/verify-email/[token]`                      | 10    | 10 min | IP                 | middleware    |
+| Resend verification email                    | 5     | 1 hour | email              | server action |
+| `/p/[token]` and `/i/[token]`                | 30    | 1 min  | token + IP         | middleware    |
+| `/api/pdf/public/{proposal,invoice}/[token]` | 30    | 1 min  | token + IP         | middleware    |
+| `/portal/[token]` redemption                 | 10    | 1 min  | IP                 | route handler |
+| Portal magic-link request action             | 5     | 1 min  | IP                 | server action |
+| Server actions (default)                     | 60    | 1 min  | userId             | server action |
+| Email-sending actions                        | 10    | 1 hour | userId             | server action |
+| Resend invoice reminder action               | 5     | 1 hour | userId + invoiceId | server action |
+| File upload actions                          | 30    | 1 hour | userId             | server action |
+| Search action                                | 60    | 1 min  | userId             | server action |
+| FX manual refresh action                     | 1     | 5 min  | userId             | server action |
 
 A few notes on choices.
 
@@ -113,18 +113,18 @@ Middleware (Edge) returns 429 with a `Retry-After` header.
 
 ```typescript
 // src/middleware.ts (excerpt)
-import { NextResponse, type NextRequest } from "next/server";
-import { limits } from "@/lib/ratelimit";
+import { NextResponse, type NextRequest } from 'next/server';
+import { limits } from '@/lib/ratelimit';
 
 export async function middleware(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "0.0.0.0";
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '0.0.0.0';
 
-  if (req.nextUrl.pathname === "/login") {
+  if (req.nextUrl.pathname === '/login') {
     const result = await limits.loginIp.limit(ip);
     if (!result.success) {
       return new NextResponse(null, {
         status: 429,
-        headers: { "Retry-After": Math.ceil((result.reset - Date.now()) / 1000).toString() },
+        headers: { 'Retry-After': Math.ceil((result.reset - Date.now()) / 1000).toString() },
       });
     }
   }
@@ -142,7 +142,7 @@ const rl = await limits.serverActionDefault.limit(userId);
 if (!rl.success) {
   return {
     ok: false,
-    error: "RATE_LIMITED",
+    error: 'RATE_LIMITED',
     retryAfter: Math.ceil((rl.reset - Date.now()) / 1000),
   };
 }
@@ -150,7 +150,7 @@ if (!rl.success) {
 
 The UI surfaces a friendly message: "You're moving fast. Try again in a few seconds." The toast uses Inter at `{typography.body-md}` against `{colors.canvas}` with a 1px border in `{colors.border}` (per `docs/design/component-patterns.md`). Stack traces and provider details are not surfaced.
 
-A 429 from middleware is logged at `info` level. The audit log does *not* receive a row for rate-limit hits — they are too noisy and too rarely useful to keep in the operational record.
+A 429 from middleware is logged at `info` level. The audit log does _not_ receive a row for rate-limit hits — they are too noisy and too rarely useful to keep in the operational record.
 
 ## Bypass
 
@@ -158,7 +158,7 @@ Never in production. In development, set `DISABLE_RATE_LIMITS=true` (read by `sr
 
 ```typescript
 // src/lib/ratelimit.ts (excerpt)
-const disabled = env.DISABLE_RATE_LIMITS === "true";
+const disabled = env.DISABLE_RATE_LIMITS === 'true';
 
 function limited(rl: Ratelimit) {
   return {

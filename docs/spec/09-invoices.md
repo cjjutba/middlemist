@@ -138,20 +138,20 @@ For `paid`, `void`, or `overdue` statuses: a banner `{component.alert-banner}` a
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `createInvoice` | `createInvoiceSchema` (clientId, projectId, issueDate?, dueDate?) | `{ ok: true, data: { id } }` | Computes number; generates token; snapshots FX; inserts. Writes audit. |
-| `updateInvoice` | `updateInvoiceSchema` (id + partials) | `{ ok: true, data: Invoice }` | Updates fields. Recomputes totals if line items changed. |
-| `sendInvoice` | `{ id }` | `{ ok: true, data: Invoice }` | Transitions to `sent`; emits `invoice.sent`. Writes audit. |
-| `markInvoicePaid` | `markPaidSchema` (id, paidAt?, paymentMethod?) | `{ ok: true, data: Invoice }` | Status → `paid`. Sets `paidAt`, `paymentMethod`, `amountPaid = total`. Writes audit. Emits `invoice.paid`. |
-| `voidInvoice` | `{ id }` | `{ ok: true }` | Status → `void`. Sets `voidedAt`. Writes audit. |
-| `regenerateInvoiceToken` | `{ id }` | `{ ok: true, data: { newToken } }` | New nanoid(21); writes audit. |
-| `addInvoiceLineItem` | `addLineItemSchema` | `{ ok: true, data: InvoiceLineItem }` | Inserts; recomputes totals. |
-| `updateInvoiceLineItem` | `updateLineItemSchema` | `{ ok: true, data: InvoiceLineItem }` | Updates; recomputes totals. |
-| `removeInvoiceLineItem` | `{ id }` | `{ ok: true }` | Removes; recomputes totals. Clears `TimeEntry.invoicedLineItemId` if applicable. |
-| `pullInvoiceFromTimeEntries` | `{ invoiceId, timeEntryIds, groupBy?: "task" \| "day" \| "single" }` | `{ ok: true, data: { lineItemsCreated } }` | Bulk-create line items from selected time entries; sets `TimeEntry.invoicedLineItemId`. |
-| `pullInvoiceFromProposalPricing` | `{ invoiceId, proposalId }` | `{ ok: true, data: { lineItemsCreated } }` | Reads proposal's pricing block; bulk-creates line items. |
-| `deleteInvoice` | `{ id }` | `{ ok: true }` | Allowed only on `draft`. Cascades line items. |
+| Action                           | Input                                                                | Output                                     | Side effects                                                                                               |
+| -------------------------------- | -------------------------------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `createInvoice`                  | `createInvoiceSchema` (clientId, projectId, issueDate?, dueDate?)    | `{ ok: true, data: { id } }`               | Computes number; generates token; snapshots FX; inserts. Writes audit.                                     |
+| `updateInvoice`                  | `updateInvoiceSchema` (id + partials)                                | `{ ok: true, data: Invoice }`              | Updates fields. Recomputes totals if line items changed.                                                   |
+| `sendInvoice`                    | `{ id }`                                                             | `{ ok: true, data: Invoice }`              | Transitions to `sent`; emits `invoice.sent`. Writes audit.                                                 |
+| `markInvoicePaid`                | `markPaidSchema` (id, paidAt?, paymentMethod?)                       | `{ ok: true, data: Invoice }`              | Status → `paid`. Sets `paidAt`, `paymentMethod`, `amountPaid = total`. Writes audit. Emits `invoice.paid`. |
+| `voidInvoice`                    | `{ id }`                                                             | `{ ok: true }`                             | Status → `void`. Sets `voidedAt`. Writes audit.                                                            |
+| `regenerateInvoiceToken`         | `{ id }`                                                             | `{ ok: true, data: { newToken } }`         | New nanoid(21); writes audit.                                                                              |
+| `addInvoiceLineItem`             | `addLineItemSchema`                                                  | `{ ok: true, data: InvoiceLineItem }`      | Inserts; recomputes totals.                                                                                |
+| `updateInvoiceLineItem`          | `updateLineItemSchema`                                               | `{ ok: true, data: InvoiceLineItem }`      | Updates; recomputes totals.                                                                                |
+| `removeInvoiceLineItem`          | `{ id }`                                                             | `{ ok: true }`                             | Removes; recomputes totals. Clears `TimeEntry.invoicedLineItemId` if applicable.                           |
+| `pullInvoiceFromTimeEntries`     | `{ invoiceId, timeEntryIds, groupBy?: "task" \| "day" \| "single" }` | `{ ok: true, data: { lineItemsCreated } }` | Bulk-create line items from selected time entries; sets `TimeEntry.invoicedLineItemId`.                    |
+| `pullInvoiceFromProposalPricing` | `{ invoiceId, proposalId }`                                          | `{ ok: true, data: { lineItemsCreated } }` | Reads proposal's pricing block; bulk-creates line items.                                                   |
+| `deleteInvoice`                  | `{ id }`                                                             | `{ ok: true }`                             | Allowed only on `draft`. Cascades line items.                                                              |
 
 ## Repository Functions
 
@@ -192,14 +192,14 @@ In `src/lib/repositories/invoice-line-items.repo.ts`:
 - **Line item tax rate.** `Decimal(5,4)`, between 0 and 1 (so 0.12 = 12%). Default 0.
 - **Status transitions:**
 
-  | From | To allowed |
-  |---|---|
-  | draft | sent, void, deleted |
-  | sent | viewed (system), paid, overdue (cron), void |
-  | viewed | paid, overdue (cron), void |
-  | overdue | paid, void |
-  | paid | (terminal) |
-  | void | (terminal) |
+  | From    | To allowed                                  |
+  | ------- | ------------------------------------------- |
+  | draft   | sent, void, deleted                         |
+  | sent    | viewed (system), paid, overdue (cron), void |
+  | viewed  | paid, overdue (cron), void                  |
+  | overdue | paid, void                                  |
+  | paid    | (terminal)                                  |
+  | void    | (terminal)                                  |
 
 ## Permissions and Tenant Isolation
 

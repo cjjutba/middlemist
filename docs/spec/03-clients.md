@@ -90,13 +90,13 @@ Modal-as-route (intercepting route pattern). The same `{component.modal}` conten
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `createClient` | `createClientSchema` | `{ ok: true, data: { id } }` | Inserts client; writes `client.created` audit. |
-| `updateClient` | `updateClientSchema` (id + partial fields) | `{ ok: true, data: Client }` | Updates client; resets `emailValid` if email changed. Writes `client.updated` audit. |
-| `archiveClient` | `{ id }` | `{ ok: true }` | Sets `archivedAt = now`. Writes `client.archived` audit. |
-| `unarchiveClient` | `{ id }` | `{ ok: true }` | Clears `archivedAt`. Writes `client.unarchived` audit. |
-| `deleteClient` | `{ id }` | `{ ok: true }` or `{ ok: false, error: "CLIENT_HAS_REFERENCES" }` | Hard-deletes if no FK references exist. Writes `client.deleted` audit. |
+| Action            | Input                                      | Output                                                            | Side effects                                                                         |
+| ----------------- | ------------------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `createClient`    | `createClientSchema`                       | `{ ok: true, data: { id } }`                                      | Inserts client; writes `client.created` audit.                                       |
+| `updateClient`    | `updateClientSchema` (id + partial fields) | `{ ok: true, data: Client }`                                      | Updates client; resets `emailValid` if email changed. Writes `client.updated` audit. |
+| `archiveClient`   | `{ id }`                                   | `{ ok: true }`                                                    | Sets `archivedAt = now`. Writes `client.archived` audit.                             |
+| `unarchiveClient` | `{ id }`                                   | `{ ok: true }`                                                    | Clears `archivedAt`. Writes `client.unarchived` audit.                               |
+| `deleteClient`    | `{ id }`                                   | `{ ok: true }` or `{ ok: false, error: "CLIENT_HAS_REFERENCES" }` | Hard-deletes if no FK references exist. Writes `client.deleted` audit.               |
 
 `requestClientMagicLink` lives in [10-client-portal](./10-client-portal.md) and is invoked from the client detail page UI.
 

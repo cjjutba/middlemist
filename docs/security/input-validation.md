@@ -32,27 +32,24 @@ The schemas are a layer above the Prisma types. They constrain input more tightl
 
 ```typescript
 // src/lib/schemas/client.schema.ts
-import { z } from "zod";
+import { z } from 'zod';
 
 export const createClientSchema = z.object({
-  name: z.string().min(1, "Name is required").max(120),
+  name: z.string().min(1, 'Name is required').max(120),
   companyName: z.string().max(120).nullable().optional(),
-  email: z.string().email("Enter a valid email").max(254),
+  email: z.string().email('Enter a valid email').max(254),
   phone: z.string().max(40).nullable().optional(),
   website: z
     .string()
-    .url("Enter a valid URL")
-    .refine(
-      (u) => /^https?:\/\//.test(u),
-      "URL must use http or https"
-    )
+    .url('Enter a valid URL')
+    .refine((u) => /^https?:\/\//.test(u), 'URL must use http or https')
     .nullable()
     .optional(),
   address: z.string().max(500).nullable().optional(),
   taxId: z.string().max(40).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   preferredCurrency: z
-    .enum(["USD", "PHP", "EUR", "GBP", "AUD", "CAD", "JPY", "SGD"])
+    .enum(['USD', 'PHP', 'EUR', 'GBP', 'AUD', 'CAD', 'JPY', 'SGD'])
     .nullable()
     .optional(),
 });
@@ -91,10 +88,10 @@ export function ClientForm() {
 
 ```typescript
 // src/actions/clients.ts (server action)
-"use server";
-import { withAuth } from "@/lib/auth/with-auth";
-import { createClientSchema } from "@/lib/schemas/client.schema";
-import { clientsRepo } from "@/lib/repositories/clients.repo";
+'use server';
+import { withAuth } from '@/lib/auth/with-auth';
+import { createClientSchema } from '@/lib/schemas/client.schema';
+import { clientsRepo } from '@/lib/repositories/clients.repo';
 
 export const createClient = withAuth(createClientSchema, async (userId, input) => {
   return clientsRepo.create(userId, input);
@@ -117,21 +114,21 @@ This split is why the schema lives in `src/lib/schemas/` (consumed by both sides
 
 ```typescript
 // src/lib/auth/with-auth.ts (excerpt)
-import { z } from "zod";
+import { z } from 'zod';
 
 export function withAuth<TInput, TOutput>(
   schema: z.ZodSchema<TInput>,
-  handler: (userId: string, input: TInput) => Promise<TOutput>
+  handler: (userId: string, input: TInput) => Promise<TOutput>,
 ) {
   return async (rawInput: unknown) => {
     const session = await auth();
-    if (!session?.user?.id) return { ok: false, error: "UNAUTHENTICATED" } as const;
+    if (!session?.user?.id) return { ok: false, error: 'UNAUTHENTICATED' } as const;
 
     const parsed = schema.safeParse(rawInput);
     if (!parsed.success) {
       return {
         ok: false,
-        error: parsed.error.issues[0]?.message ?? "INVALID_INPUT",
+        error: parsed.error.issues[0]?.message ?? 'INVALID_INPUT',
       } as const;
     }
 
@@ -141,7 +138,7 @@ export function withAuth<TInput, TOutput>(
     } catch (e) {
       return {
         ok: false,
-        error: e instanceof Error ? e.message : "UNKNOWN_ERROR",
+        error: e instanceof Error ? e.message : 'UNKNOWN_ERROR',
       } as const;
     }
   };
@@ -157,10 +154,10 @@ export function withAuth<TInput, TOutput>(
 async function onSubmit(values: CreateClientInput) {
   const result = await createClient(values);
   if (!result.ok) {
-    form.setError("root", { message: result.error });
+    form.setError('root', { message: result.error });
     return;
   }
-  toast.success("Client created");
+  toast.success('Client created');
   router.push(`/clients/${result.data.id}`);
 }
 ```
@@ -196,8 +193,8 @@ The 254-character cap matches the RFC 5321 maximum length for an SMTP address.
 ```typescript
 const httpUrlSchema = z
   .string()
-  .url("Enter a valid URL")
-  .refine((u) => /^https?:\/\//.test(u), "URL must use http or https");
+  .url('Enter a valid URL')
+  .refine((u) => /^https?:\/\//.test(u), 'URL must use http or https');
 ```
 
 The allowlist matters because `z.string().url()` accepts schemes like `javascript:`, `data:`, and `file:`, which are dangerous when echoed back into HTML. Restrict to `http` and `https` for any user-supplied URL that will be rendered as a link.
@@ -209,26 +206,24 @@ For URLs displayed in proposal blocks or update content, the rich-text sanitizer
 User-supplied markdown (proposal block bodies, update content, signature blocks, custom email subject and body) is validated as a string with a max length. Sanitization happens at render time:
 
 ```typescript
-const markdownSchema = z
-  .string()
-  .max(50000, "Content is too long");
+const markdownSchema = z.string().max(50000, 'Content is too long');
 ```
 
 The actual sanitization (markdown → HTML → `sanitize-html` allowlist) lives in the renderer. The schema's job is to bound the size and prevent giant payloads from reaching the renderer.
 
 ## Webhook payloads
 
-Webhook handlers (Inngest, UploadThing, Resend) verify the provider signature first, then parse the payload through a schema specific to the event type. The schema's role here is *not* security (the signature is what makes the request trustworthy) but type safety: the handler can rely on `event.data.proposalId` being a string instead of guessing.
+Webhook handlers (Inngest, UploadThing, Resend) verify the provider signature first, then parse the payload through a schema specific to the event type. The schema's role here is _not_ security (the signature is what makes the request trustworthy) but type safety: the handler can rely on `event.data.proposalId` being a string instead of guessing.
 
 ```typescript
 // src/lib/schemas/webhook.schema.ts
 export const resendBounceSchema = z.object({
-  type: z.literal("email.bounced"),
+  type: z.literal('email.bounced'),
   data: z.object({
     email_id: z.string(),
     to: z.array(z.string().email()),
     bounce: z.object({
-      type: z.enum(["hard", "soft"]),
+      type: z.enum(['hard', 'soft']),
       reason: z.string().optional(),
     }),
   }),

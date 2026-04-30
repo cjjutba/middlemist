@@ -4,7 +4,7 @@ The freelancer authenticates with email and password. The client (a non-account 
 
 ## Provider and flow
 
-Auth.js v5 (the rewrite of NextAuth, native to Next 15 App Router) handles the session layer. The credentials provider is the only authentication adapter wired up. The magic-link provider that ships with Auth.js is *not* used for freelancer login; magic links are reserved for client-portal access and use a custom flow (`docs/security/magic-links.md`).
+Auth.js v5 (the rewrite of NextAuth, native to Next 15 App Router) handles the session layer. The credentials provider is the only authentication adapter wired up. The magic-link provider that ships with Auth.js is _not_ used for freelancer login; magic links are reserved for client-portal access and use a custom flow (`docs/security/magic-links.md`).
 
 A freelancer's complete authentication state is one row in `User` (with `passwordHash` and `emailVerifiedAt` columns) plus the JWT-signed session cookie issued by Auth.js. There is no separate session table. There is no `RefreshToken` table. The session cookie is the session.
 
@@ -16,12 +16,12 @@ This aligns with NIST SP 800-63B (June 2017 revision and later): length over com
 
 ```typescript
 // src/lib/schemas/auth.schema.ts
-import { z } from "zod";
+import { z } from 'zod';
 
 export const passwordSchema = z
   .string()
-  .min(12, "Password must be at least 12 characters")
-  .max(128, "Password must be 128 characters or fewer");
+  .min(12, 'Password must be at least 12 characters')
+  .max(128, 'Password must be 128 characters or fewer');
 
 export const signupSchema = z.object({
   name: z.string().min(1).max(120),
@@ -43,7 +43,7 @@ Bcrypt at cost 12. Implementation via `bcryptjs` (pure JavaScript; works in Verc
 
 ```typescript
 // src/lib/auth/password.ts
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs';
 
 const COST = 12;
 
@@ -66,37 +66,34 @@ Auth.js JWT strategy (the default for v5). The session is signed with `AUTH_SECR
 
 ```typescript
 // src/lib/auth/config.ts
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { env } from "@/lib/env";
-import { loginSchema } from "@/lib/schemas/auth.schema";
-import { usersRepo } from "@/lib/repositories/users.repo";
-import { verifyPassword } from "./password";
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import { env } from '@/lib/env';
+import { loginSchema } from '@/lib/schemas/auth.schema';
+import { usersRepo } from '@/lib/repositories/users.repo';
+import { verifyPassword } from './password';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: env.AUTH_SECRET,
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
     maxAge: 60 * 60 * 24 * 30, // 30 days
-    updateAge: 60 * 60 * 24,    // refresh once per day if active
+    updateAge: 60 * 60 * 24, // refresh once per day if active
   },
   cookies: {
     sessionToken: {
-      name:
-        env.NODE_ENV === "production"
-          ? "__Secure-middlemist.session"
-          : "middlemist.session",
+      name: env.NODE_ENV === 'production' ? '__Secure-middlemist.session' : 'middlemist.session',
       options: {
         httpOnly: true,
-        sameSite: "lax",
-        secure: env.NODE_ENV === "production",
-        path: "/",
+        sameSite: 'lax',
+        secure: env.NODE_ENV === 'production',
+        path: '/',
       },
     },
   },
   pages: {
-    signIn: "/login",
-    error: "/login",
+    signIn: '/login',
+    error: '/login',
   },
   providers: [
     Credentials({
@@ -143,22 +140,22 @@ The verification token is a JWT-shaped signed payload (per Module 01 spec):
 
 ```typescript
 // src/lib/auth/tokens.ts
-import { SignJWT, jwtVerify } from "jose";
-import { env } from "@/lib/env";
+import { SignJWT, jwtVerify } from 'jose';
+import { env } from '@/lib/env';
 
 const secret = new TextEncoder().encode(env.AUTH_SECRET);
 
 export async function signEmailVerifyToken(userId: string, email: string) {
-  return new SignJWT({ purpose: "email-verify", userId, email })
-    .setProtectedHeader({ alg: "HS256" })
+  return new SignJWT({ purpose: 'email-verify', userId, email })
+    .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime("24h")
+    .setExpirationTime('24h')
     .sign(secret);
 }
 
 export async function verifyEmailVerifyToken(token: string) {
-  const { payload } = await jwtVerify(token, secret, { algorithms: ["HS256"] });
-  if (payload.purpose !== "email-verify") throw new Error("WRONG_PURPOSE");
+  const { payload } = await jwtVerify(token, secret, { algorithms: ['HS256'] });
+  if (payload.purpose !== 'email-verify') throw new Error('WRONG_PURPOSE');
   return { userId: payload.userId as string, email: payload.email as string };
 }
 ```
@@ -173,10 +170,10 @@ export async function verifyEmailVerifyToken(token: string) {
 
 Initiated from `/forgot-password`. Flow:
 
-1. User submits email. The action *always* returns success regardless of whether the email matches a row. (Anti-enumeration: an attacker probing the form learns nothing about which addresses are registered.)
+1. User submits email. The action _always_ returns success regardless of whether the email matches a row. (Anti-enumeration: an attacker probing the form learns nothing about which addresses are registered.)
 2. If the email matches a verified user, a `password-reset` JWT (1-hour expiry, payload `{ purpose, userId, passwordVersion }`) is signed and emailed.
 3. The user clicks the link, lands on `/reset-password/[token]`. The page verifies the token, then renders a form for the new password.
-4. On submit, the action verifies the token *again*, hashes the new password, increments `User.passwordVersion`, updates `passwordHash`, writes audit `user.password-changed`, and redirects to `/login`.
+4. On submit, the action verifies the token _again_, hashes the new password, increments `User.passwordVersion`, updates `passwordHash`, writes audit `user.password-changed`, and redirects to `/login`.
 
 The `passwordVersion` claim is the single-use guard. Each reset bumps the version; the second click of the same emailed link finds `payload.passwordVersion` no longer matches and the verifier throws.
 
@@ -198,15 +195,15 @@ From settings, a logged-in user can change their password. Required: current pas
 
 A two-step flow that prevents an attacker who has temporary access from quietly rerouting the account.
 
-1. From settings, the user submits a new email and their current password. The action verifies the password and writes a `pending-email-change` JWT (24-hour expiry, payload `{ purpose, userId, newEmail }`) sent to the *new* address.
+1. From settings, the user submits a new email and their current password. The action verifies the password and writes a `pending-email-change` JWT (24-hour expiry, payload `{ purpose, userId, newEmail }`) sent to the _new_ address.
 2. The user clicks the link from the new mailbox. The handler verifies the token, sets `User.email = newEmail`, sets `User.emailVerifiedAt = now` for the new address, and writes audit `user.email-changed` with metadata `{ from, to }`.
 3. The old address gets a notification email ("your account email was changed; if this wasn't you, contact security@middlemist.app").
 
-`User.email` is unique. If the new email already belongs to another row, the action returns `EMAIL_TAKEN` *before* sending the confirmation. The error is identical whether the email is taken or invalid; the form does not differentiate.
+`User.email` is unique. If the new email already belongs to another row, the action returns `EMAIL_TAKEN` _before_ sending the confirmation. The error is identical whether the email is taken or invalid; the form does not differentiate.
 
 ## Login throttling
 
-Five failed login attempts per email per ten minutes triggers a fifteen-minute lockout for that email. Per email, *not* per IP. An attacker can rotate IPs trivially; an account is keyed on the address.
+Five failed login attempts per email per ten minutes triggers a fifteen-minute lockout for that email. Per email, _not_ per IP. An attacker can rotate IPs trivially; an account is keyed on the address.
 
 Implementation: Upstash Ratelimit with a sliding-window strategy and key `auth:login-fail:{email}`. The credentials `authorize` callback increments the counter on each failure; a counter ≥ 5 returns null without checking the password. Successful login clears the counter.
 
@@ -216,16 +213,16 @@ This is a coarse but sufficient defense. A determined attacker forces one accoun
 
 ## Routes
 
-| Route | Method | Purpose |
-|---|---|---|
-| `/api/auth/[...nextauth]` | GET/POST | Auth.js callbacks (sign-in, sign-out, CSRF, session) |
-| `/(auth)/signup` | GET | Sign-up form |
-| `/(auth)/login` | GET | Login form |
-| `/(auth)/forgot-password` | GET | Request reset |
-| `/(auth)/reset-password/[token]` | GET | Reset redemption |
-| `/(auth)/verify-email/[token]` | GET | Email verification redemption |
+| Route                            | Method   | Purpose                                              |
+| -------------------------------- | -------- | ---------------------------------------------------- |
+| `/api/auth/[...nextauth]`        | GET/POST | Auth.js callbacks (sign-in, sign-out, CSRF, session) |
+| `/(auth)/signup`                 | GET      | Sign-up form                                         |
+| `/(auth)/login`                  | GET      | Login form                                           |
+| `/(auth)/forgot-password`        | GET      | Request reset                                        |
+| `/(auth)/reset-password/[token]` | GET      | Reset redemption                                     |
+| `/(auth)/verify-email/[token]`   | GET      | Email verification redemption                        |
 
-The signup, login, forgot-password, and password-change actions live in `src/actions/auth.ts` and are *not* `withAuth`-wrapped (signup and login by definition pre-date the session). They run their own zod validation and rate limiting.
+The signup, login, forgot-password, and password-change actions live in `src/actions/auth.ts` and are _not_ `withAuth`-wrapped (signup and login by definition pre-date the session). They run their own zod validation and rate limiting.
 
 ## v2
 

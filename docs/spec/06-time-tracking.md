@@ -91,14 +91,14 @@ The strip uses `{colors.surface-card}` background, hairline `{colors.hairline}` 
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `startTimer` | `{ projectId, taskId?, description? }` | `{ ok: true, data: TimeEntry } \| { ok: false, error: "TIMER_ALREADY_RUNNING", runningEntryId }` | Inserts a `TimeEntry` with `endedAt = null`. |
-| `stopTimer` | `{}` | `{ ok: true, data: TimeEntry }` | Sets `endedAt` and `durationSec` on the user's running entry. |
-| `createManualEntry` | `manualEntrySchema` | `{ ok: true, data: TimeEntry }` | Inserts a complete entry. Writes `time-entry.created` audit. |
-| `updateEntry` | `updateEntrySchema` | `{ ok: true, data: TimeEntry }` | Updates an entry. Disallowed if `invoicedLineItemId` is set. Writes audit. |
-| `deleteEntry` | `{ id }` | `{ ok: true }` | Removes an entry. Disallowed if `invoicedLineItemId` is set. Writes audit. |
-| `setProjectTimeVisibility` | `{ projectId, visible }` | `{ ok: true }` | Toggles `Project.timeVisibleToClient`. |
+| Action                     | Input                                  | Output                                                                                           | Side effects                                                               |
+| -------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| `startTimer`               | `{ projectId, taskId?, description? }` | `{ ok: true, data: TimeEntry } \| { ok: false, error: "TIMER_ALREADY_RUNNING", runningEntryId }` | Inserts a `TimeEntry` with `endedAt = null`.                               |
+| `stopTimer`                | `{}`                                   | `{ ok: true, data: TimeEntry }`                                                                  | Sets `endedAt` and `durationSec` on the user's running entry.              |
+| `createManualEntry`        | `manualEntrySchema`                    | `{ ok: true, data: TimeEntry }`                                                                  | Inserts a complete entry. Writes `time-entry.created` audit.               |
+| `updateEntry`              | `updateEntrySchema`                    | `{ ok: true, data: TimeEntry }`                                                                  | Updates an entry. Disallowed if `invoicedLineItemId` is set. Writes audit. |
+| `deleteEntry`              | `{ id }`                               | `{ ok: true }`                                                                                   | Removes an entry. Disallowed if `invoicedLineItemId` is set. Writes audit. |
+| `setProjectTimeVisibility` | `{ projectId, visible }`               | `{ ok: true }`                                                                                   | Toggles `Project.timeVisibleToClient`.                                     |
 
 ## Repository Functions
 

@@ -58,18 +58,18 @@ Three things are deliberately out of scope for this wave:
 
 ## Pointer table
 
-| Topic | File |
-|---|---|
-| Type scale, font loading, pairing | `typography.md` |
-| Color tokens, semantic layer, contrast | `color.md` |
-| Spacing scale, radius scale, layout widths | `spacing-and-radius.md` |
-| Motion durations, easing, reduced motion | `motion.md` |
-| App Shell, Document Shell, page layouts | `layout-patterns.md` |
-| Component tokens and specs | `component-patterns.md` |
-| Lucide icons, product-mockup illustration | `icons-and-illustration.md` |
-| Empty, loading, error states | `empty-and-loading-states.md` |
-| Public proposal, invoice, client portal | `public-views.md` |
-| External design references | `references.md` |
-| What not to do | `anti-patterns.md` |
+| Topic                                      | File                          |
+| ------------------------------------------ | ----------------------------- |
+| Type scale, font loading, pairing          | `typography.md`               |
+| Color tokens, semantic layer, contrast     | `color.md`                    |
+| Spacing scale, radius scale, layout widths | `spacing-and-radius.md`       |
+| Motion durations, easing, reduced motion   | `motion.md`                   |
+| App Shell, Document Shell, page layouts    | `layout-patterns.md`          |
+| Component tokens and specs                 | `component-patterns.md`       |
+| Lucide icons, product-mockup illustration  | `icons-and-illustration.md`   |
+| Empty, loading, error states               | `empty-and-loading-states.md` |
+| Public proposal, invoice, client portal    | `public-views.md`             |
+| External design references                 | `references.md`               |
+| What not to do                             | `anti-patterns.md`            |
 
 When a question crosses several files (for example, "how should the public invoice header look"), start from the layout pattern, then the component pattern, then the public-views doc for module-specific guidance. The anti-patterns doc is read last as a check.

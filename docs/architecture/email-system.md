@@ -13,9 +13,9 @@ Middlemist uses Resend to send transactional email and React Email to compose te
 
 ```typescript
 // src/lib/email/send.ts
-import { Resend } from "resend";
-import { render } from "@react-email/render";
-import { env } from "@/lib/env";
+import { Resend } from 'resend';
+import { render } from '@react-email/render';
+import { env } from '@/lib/env';
 
 const resend = new Resend(env.RESEND_API_KEY);
 
@@ -37,7 +37,7 @@ export async function sendEmail({
   idempotencyKey,
 }: SendArgs) {
   const html = await render(react);
-  const from = `${fromName ?? "Middlemist"} <noreply@middlemist.app>`;
+  const from = `${fromName ?? 'Middlemist'} <noreply@middlemist.app>`;
   return resend.emails.send(
     {
       from,
@@ -46,7 +46,7 @@ export async function sendEmail({
       html,
       reply_to: replyTo,
     },
-    idempotencyKey ? { idempotencyKey } : undefined
+    idempotencyKey ? { idempotencyKey } : undefined,
   );
 }
 ```
@@ -57,21 +57,21 @@ The helper is the only place `Resend` is imported. Template rendering, from-addr
 
 Thirteen templates are defined for v1. All live under `src/lib/email/templates/` as React components. Each one accepts a typed props object that holds the data needed to render it.
 
-| Template | Audience | Trigger |
-|---|---|---|
-| `welcome.tsx` | Freelancer | `user.signup` event |
-| `proposal-sent.tsx` | Client | `proposal.sent` event |
-| `proposal-viewed.tsx` | Freelancer | `proposal.viewed` event |
-| `proposal-accepted.tsx` | Freelancer | `proposal.accepted` event |
-| `proposal-declined.tsx` | Freelancer | `proposal.declined` event |
-| `invoice-sent.tsx` | Client | `invoice.sent` event |
-| `invoice-viewed.tsx` | Freelancer | `invoice.viewed` event |
-| `invoice-reminder.tsx` | Client | `invoices.send-reminders` cron |
-| `invoice-paid.tsx` | Freelancer | `invoice.paid` event |
-| `update-posted.tsx` | Client | `update.posted` event |
-| `magic-link.tsx` | Client | `client.magic-link-requested` event |
-| `password-reset.tsx` | Freelancer | password reset action |
-| `email-verify.tsx` | Freelancer | signup or email change |
+| Template                | Audience   | Trigger                             |
+| ----------------------- | ---------- | ----------------------------------- |
+| `welcome.tsx`           | Freelancer | `user.signup` event                 |
+| `proposal-sent.tsx`     | Client     | `proposal.sent` event               |
+| `proposal-viewed.tsx`   | Freelancer | `proposal.viewed` event             |
+| `proposal-accepted.tsx` | Freelancer | `proposal.accepted` event           |
+| `proposal-declined.tsx` | Freelancer | `proposal.declined` event           |
+| `invoice-sent.tsx`      | Client     | `invoice.sent` event                |
+| `invoice-viewed.tsx`    | Freelancer | `invoice.viewed` event              |
+| `invoice-reminder.tsx`  | Client     | `invoices.send-reminders` cron      |
+| `invoice-paid.tsx`      | Freelancer | `invoice.paid` event                |
+| `update-posted.tsx`     | Client     | `update.posted` event               |
+| `magic-link.tsx`        | Client     | `client.magic-link-requested` event |
+| `password-reset.tsx`    | Freelancer | password reset action               |
+| `email-verify.tsx`      | Freelancer | signup or email change              |
 
 Each template imports a shared layout (`layout.tsx`) that handles header, footer, signature, and brand mark. The layout reads from the freelancer's `User.businessName` and `User.logoUrl` and renders them at the top of the email so the client sees the freelancer's brand, not Middlemist's.
 
@@ -112,7 +112,7 @@ Resend posts to `/api/email/webhook` for bounces, complaints, and delivery event
 ```typescript
 if (!client.emailValid) {
   // Surface a UI warning; do not send.
-  return { ok: false, error: "CLIENT_EMAIL_BOUNCED" };
+  return { ok: false, error: 'CLIENT_EMAIL_BOUNCED' };
 }
 ```
 

@@ -83,13 +83,13 @@ The client portal renders the same `{component.client-portal-update-card}` shape
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
+| Action         | Input                                                                                          | Output                       | Side effects                                                                                                                            |
+| -------------- | ---------------------------------------------------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `createUpdate` | `createUpdateSchema` (projectId, title, category, bodyJson, attachments, notifyClient, pinned) | `{ ok: true, data: { id } }` | Server-renders `bodyHtml`; inserts; if `pinned`, unpins others; if `notifyClient`, emits `update.posted`. Writes `update.posted` audit. |
-| `editUpdate` | `editUpdateSchema` (id + partials) | `{ ok: true, data: Update }` | Refuses outside 24h window. Re-renders `bodyHtml`. Writes `update.edited` audit. |
-| `deleteUpdate` | `{ id }` | `{ ok: true }` | Removes update and attachments. Writes `update.deleted` audit. |
-| `pinUpdate` | `{ id }` | `{ ok: true }` | Sets `isPinned = true`; unpins others on same project. Writes `update.pinned` audit. |
-| `unpinUpdate` | `{ id }` | `{ ok: true }` | Sets `isPinned = false`. Writes `update.unpinned` audit. |
+| `editUpdate`   | `editUpdateSchema` (id + partials)                                                             | `{ ok: true, data: Update }` | Refuses outside 24h window. Re-renders `bodyHtml`. Writes `update.edited` audit.                                                        |
+| `deleteUpdate` | `{ id }`                                                                                       | `{ ok: true }`               | Removes update and attachments. Writes `update.deleted` audit.                                                                          |
+| `pinUpdate`    | `{ id }`                                                                                       | `{ ok: true }`               | Sets `isPinned = true`; unpins others on same project. Writes `update.pinned` audit.                                                    |
+| `unpinUpdate`  | `{ id }`                                                                                       | `{ ok: true }`               | Sets `isPinned = false`. Writes `update.unpinned` audit.                                                                                |
 
 ## Repository Functions
 

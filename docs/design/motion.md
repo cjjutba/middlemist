@@ -18,12 +18,12 @@ Three principles govern every motion decision in the product.
 
 Four durations cover every motion in the product. Picking a duration is a matter of matching the kind of change to the right speed.
 
-| Duration | Easing | Use |
-|---|---|---|
-| 150ms | ease-out | State changes: button press, hover-equivalent shifts, focus rings |
-| 200ms | ease-in-out | Layout shifts: accordion open/close, dropdown open, tab switch |
-| 300ms | ease-out | Page-level: modal enter, sheet slide, page transition (rare) |
-| 0ms | none | Critical user actions: form submission, navigation away from current page |
+| Duration | Easing      | Use                                                                       |
+| -------- | ----------- | ------------------------------------------------------------------------- |
+| 150ms    | ease-out    | State changes: button press, hover-equivalent shifts, focus rings         |
+| 200ms    | ease-in-out | Layout shifts: accordion open/close, dropdown open, tab switch            |
+| 300ms    | ease-out    | Page-level: modal enter, sheet slide, page transition (rare)              |
+| 0ms      | none        | Critical user actions: form submission, navigation away from current page |
 
 A button press uses 150ms because the change is small (background color shifts from `{colors.primary}` to `{colors.primary-active}`) and the user expects an immediate response. A modal entering uses 300ms because the change is large (a new surface fades and translates into view) and the slower duration helps the eye locate the new content.
 
@@ -107,8 +107,12 @@ A skeleton boxes uses a shimmer animation: a horizontal gradient (linear-gradien
 
 ```css
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .skeleton {

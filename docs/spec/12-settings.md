@@ -100,22 +100,22 @@ States: each form has form-level error banners and field-level error captions, t
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `updateProfile` | `updateProfileSchema` (name, defaultTimezone) | `{ ok: true, data: User }` | Updates user. |
-| `requestEmailChange` | `{ newEmail }` | `{ ok: true }` | Sends verify email to new address. (Detail in [01-auth-and-account](./01-auth-and-account.md).) |
-| `verifyEmailChange` | `{ token }` | `{ ok: true }` | Applies email change. |
-| `changePassword` | `{ currentPassword, newPassword }` | `{ ok: true }` | Verifies current; updates hash; invalidates other sessions. |
-| `updateBusiness` | `updateBusinessSchema` | `{ ok: true, data: User }` | Updates business fields. |
-| `updateEmailSettings` | `updateEmailSettingsSchema` (from-name, reply-to, signature) | `{ ok: true, data: EmailSettings }` | Upserts `EmailSettings`. |
-| `updateEmailTemplate` | `updateEmailTemplateSchema` (templateKey, subject, body) | `{ ok: true }` | Per-template overrides. (Detail in [15-email-customization](./15-email-customization.md).) |
-| `updateReminderConfig` | `{ isEnabled, daysBeforeDue, daysAfterDue }` | `{ ok: true, data: InvoiceReminderConfig }` | Upserts reminder config. |
-| `updateBranding` | `updateBrandingSchema` (logoUrl, signatureUrl) | `{ ok: true }` | Updates `User.logoUrl`, `User.signatureUrl`. |
-| `revokeAllPortalSessions` | `{}` | `{ ok: true, data: { revoked: number } }` | Sets `sessionExpiresAt = now` on all sessions for user. |
-| `regenerateAllPublicTokens` | `{}` | `{ ok: true, data: { projects, proposals, invoices } }` | New nanoid for every owned public token in a transaction. Writes audit `user.tokens-regenerated`. |
-| `signOutEverywhere` | `{}` | `{ ok: true }` | Rotates session secret for the user; current session is also invalidated. |
-| `exportData` | `{}` | `{ ok: true }` | Assembles JSON bundle; emails to user. Rate-limited 3/hour per user. |
-| `requestAccountDeletion` / `cancelAccountDeletion` | covered in [01-auth-and-account](./01-auth-and-account.md). |
+| Action                                             | Input                                                        | Output                                                  | Side effects                                                                                      |
+| -------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `updateProfile`                                    | `updateProfileSchema` (name, defaultTimezone)                | `{ ok: true, data: User }`                              | Updates user.                                                                                     |
+| `requestEmailChange`                               | `{ newEmail }`                                               | `{ ok: true }`                                          | Sends verify email to new address. (Detail in [01-auth-and-account](./01-auth-and-account.md).)   |
+| `verifyEmailChange`                                | `{ token }`                                                  | `{ ok: true }`                                          | Applies email change.                                                                             |
+| `changePassword`                                   | `{ currentPassword, newPassword }`                           | `{ ok: true }`                                          | Verifies current; updates hash; invalidates other sessions.                                       |
+| `updateBusiness`                                   | `updateBusinessSchema`                                       | `{ ok: true, data: User }`                              | Updates business fields.                                                                          |
+| `updateEmailSettings`                              | `updateEmailSettingsSchema` (from-name, reply-to, signature) | `{ ok: true, data: EmailSettings }`                     | Upserts `EmailSettings`.                                                                          |
+| `updateEmailTemplate`                              | `updateEmailTemplateSchema` (templateKey, subject, body)     | `{ ok: true }`                                          | Per-template overrides. (Detail in [15-email-customization](./15-email-customization.md).)        |
+| `updateReminderConfig`                             | `{ isEnabled, daysBeforeDue, daysAfterDue }`                 | `{ ok: true, data: InvoiceReminderConfig }`             | Upserts reminder config.                                                                          |
+| `updateBranding`                                   | `updateBrandingSchema` (logoUrl, signatureUrl)               | `{ ok: true }`                                          | Updates `User.logoUrl`, `User.signatureUrl`.                                                      |
+| `revokeAllPortalSessions`                          | `{}`                                                         | `{ ok: true, data: { revoked: number } }`               | Sets `sessionExpiresAt = now` on all sessions for user.                                           |
+| `regenerateAllPublicTokens`                        | `{}`                                                         | `{ ok: true, data: { projects, proposals, invoices } }` | New nanoid for every owned public token in a transaction. Writes audit `user.tokens-regenerated`. |
+| `signOutEverywhere`                                | `{}`                                                         | `{ ok: true }`                                          | Rotates session secret for the user; current session is also invalidated.                         |
+| `exportData`                                       | `{}`                                                         | `{ ok: true }`                                          | Assembles JSON bundle; emails to user. Rate-limited 3/hour per user.                              |
+| `requestAccountDeletion` / `cancelAccountDeletion` | covered in [01-auth-and-account](./01-auth-and-account.md).  |
 
 ## Repository Functions
 

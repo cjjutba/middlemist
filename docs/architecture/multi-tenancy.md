@@ -24,8 +24,8 @@ ESLint enforces the pattern. A custom rule `no-direct-prisma` forbids importing 
 ```typescript
 // src/lib/repositories/clients.repo.ts
 
-import { prisma } from "@/lib/prisma";
-import { Currency } from "@prisma/client";
+import { prisma } from '@/lib/prisma';
+import { Currency } from '@prisma/client';
 
 export const clientsRepo = {
   async findById(userId: string, id: string) {
@@ -34,10 +34,7 @@ export const clientsRepo = {
     });
   },
 
-  async list(
-    userId: string,
-    filters: { search?: string; includeArchived?: boolean } = {}
-  ) {
+  async list(userId: string, filters: { search?: string; includeArchived?: boolean } = {}) {
     return prisma.client.findMany({
       where: {
         userId,
@@ -45,14 +42,14 @@ export const clientsRepo = {
         ...(filters.search
           ? {
               OR: [
-                { name: { contains: filters.search, mode: "insensitive" } },
-                { companyName: { contains: filters.search, mode: "insensitive" } },
-                { email: { contains: filters.search, mode: "insensitive" } },
+                { name: { contains: filters.search, mode: 'insensitive' } },
+                { companyName: { contains: filters.search, mode: 'insensitive' } },
+                { email: { contains: filters.search, mode: 'insensitive' } },
               ],
             }
           : {}),
       },
-      orderBy: { name: "asc" },
+      orderBy: { name: 'asc' },
     });
   },
 
@@ -68,7 +65,7 @@ export const clientsRepo = {
       taxId?: string;
       notes?: string;
       preferredCurrency?: Currency;
-    }
+    },
   ) {
     return prisma.client.create({
       data: { ...input, userId },
@@ -88,13 +85,13 @@ export const clientsRepo = {
       taxId: string | null;
       notes: string | null;
       preferredCurrency: Currency | null;
-    }>
+    }>,
   ) {
     const result = await prisma.client.updateMany({
       where: { id, userId },
       data: input,
     });
-    if (result.count === 0) throw new Error("Client not found");
+    if (result.count === 0) throw new Error('Client not found');
     return clientsRepo.findById(userId, id);
   },
 
@@ -103,7 +100,7 @@ export const clientsRepo = {
       where: { id, userId, archivedAt: null },
       data: { archivedAt: new Date() },
     });
-    if (result.count === 0) throw new Error("Client not found or already archived");
+    if (result.count === 0) throw new Error('Client not found or already archived');
   },
 };
 ```
@@ -122,29 +119,29 @@ Server Actions are the only mutation entry points the app exposes. Every action 
 ```typescript
 // src/lib/auth/with-auth.ts
 
-import { auth } from "@/lib/auth/config";
-import { z } from "zod";
+import { auth } from '@/lib/auth/config';
+import { z } from 'zod';
 
 type ActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
 export function withAuth<TInput, TOutput>(
   schema: z.ZodSchema<TInput>,
-  handler: (userId: string, input: TInput) => Promise<TOutput>
+  handler: (userId: string, input: TInput) => Promise<TOutput>,
 ): (rawInput: unknown) => Promise<ActionResult<TOutput>> {
   return async (rawInput) => {
     const session = await auth();
     if (!session?.user?.id) {
-      return { ok: false, error: "UNAUTHENTICATED" };
+      return { ok: false, error: 'UNAUTHENTICATED' };
     }
     const parsed = schema.safeParse(rawInput);
     if (!parsed.success) {
-      return { ok: false, error: parsed.error.issues[0]?.message ?? "INVALID_INPUT" };
+      return { ok: false, error: parsed.error.issues[0]?.message ?? 'INVALID_INPUT' };
     }
     try {
       const data = await handler(session.user.id, parsed.data);
       return { ok: true, data };
     } catch (e) {
-      return { ok: false, error: e instanceof Error ? e.message : "UNKNOWN_ERROR" };
+      return { ok: false, error: e instanceof Error ? e.message : 'UNKNOWN_ERROR' };
     }
   };
 }
@@ -154,11 +151,11 @@ export function withAuth<TInput, TOutput>(
 
 ```typescript
 // src/app/(app)/clients/clients.action.ts
-"use server";
+'use server';
 
-import { withAuth } from "@/lib/auth/with-auth";
-import { clientsRepo } from "@/lib/repositories/clients.repo";
-import { createClientSchema } from "@/lib/schemas/client.schema";
+import { withAuth } from '@/lib/auth/with-auth';
+import { clientsRepo } from '@/lib/repositories/clients.repo';
+import { createClientSchema } from '@/lib/schemas/client.schema';
 
 export const createClient = withAuth(createClientSchema, async (userId, input) => {
   return clientsRepo.create(userId, input);
@@ -200,25 +197,25 @@ Every repository function has a two-user isolation test. The test seeds two user
 ```typescript
 // src/lib/repositories/__tests__/clients.repo.test.ts
 
-import { describe, expect, it, beforeEach } from "vitest";
-import { prisma } from "@/lib/prisma";
-import { clientsRepo } from "../clients.repo";
+import { describe, expect, it, beforeEach } from 'vitest';
+import { prisma } from '@/lib/prisma';
+import { clientsRepo } from '../clients.repo';
 
-describe("clientsRepo (multi-tenant isolation)", () => {
+describe('clientsRepo (multi-tenant isolation)', () => {
   let userA: string;
   let userB: string;
 
   beforeEach(async () => {
     await prisma.client.deleteMany();
     await prisma.user.deleteMany();
-    userA = (await prisma.user.create({ data: { email: "a@test", name: "A" } })).id;
-    userB = (await prisma.user.create({ data: { email: "b@test", name: "B" } })).id;
+    userA = (await prisma.user.create({ data: { email: 'a@test', name: 'A' } })).id;
+    userB = (await prisma.user.create({ data: { email: 'b@test', name: 'B' } })).id;
 
     await prisma.client.create({
-      data: { userId: userA, name: "Acme", email: "acme@a.test" },
+      data: { userId: userA, name: 'Acme', email: 'acme@a.test' },
     });
     await prisma.client.create({
-      data: { userId: userB, name: "Acme", email: "acme@b.test" },
+      data: { userId: userB, name: 'Acme', email: 'acme@b.test' },
     });
   });
 
@@ -227,23 +224,23 @@ describe("clientsRepo (multi-tenant isolation)", () => {
     const bClients = await clientsRepo.list(userB);
     expect(aClients).toHaveLength(1);
     expect(bClients).toHaveLength(1);
-    expect(aClients[0].email).toBe("acme@a.test");
-    expect(bClients[0].email).toBe("acme@b.test");
+    expect(aClients[0].email).toBe('acme@a.test');
+    expect(bClients[0].email).toBe('acme@b.test');
   });
 
-  it("findById returns null for cross-tenant access", async () => {
+  it('findById returns null for cross-tenant access', async () => {
     const bClient = await prisma.client.findFirst({ where: { userId: userB } });
     const result = await clientsRepo.findById(userA, bClient!.id);
     expect(result).toBeNull();
   });
 
-  it("update is a no-op for cross-tenant access", async () => {
+  it('update is a no-op for cross-tenant access', async () => {
     const bClient = await prisma.client.findFirst({ where: { userId: userB } });
-    await expect(
-      clientsRepo.update(userA, bClient!.id, { name: "Changed" })
-    ).rejects.toThrow("Client not found");
+    await expect(clientsRepo.update(userA, bClient!.id, { name: 'Changed' })).rejects.toThrow(
+      'Client not found',
+    );
     const reread = await prisma.client.findUnique({ where: { id: bClient!.id } });
-    expect(reread?.name).toBe("Acme");
+    expect(reread?.name).toBe('Acme');
   });
 });
 ```

@@ -4,29 +4,29 @@ Every piece of the stack was picked deliberately. This document records the choi
 
 ## Stack table
 
-| Layer | Choice |
-|---|---|
-| Framework | Next.js 15 App Router |
-| Language | TypeScript (strict) |
-| Database | PostgreSQL via Neon |
-| ORM | Prisma 6 |
-| Auth | Auth.js v5 (NextAuth) |
-| Background jobs | Inngest |
-| Email | Resend + React Email |
-| Files | UploadThing |
-| PDF | `@react-pdf/renderer` |
-| Rate limiting | Upstash Ratelimit |
-| Components | shadcn/ui (heavily themed) |
-| Editor | Tiptap v2 |
-| Forms | react-hook-form + zod |
-| Validation | zod (shared client/server) |
-| Search | Postgres `pg_trgm` |
-| Hosting | Vercel |
-| Package manager | pnpm |
-| Testing | Vitest + Playwright |
-| Error tracking | Sentry |
-| Analytics | Plausible |
-| FX | exchangerate.host |
+| Layer           | Choice                     |
+| --------------- | -------------------------- |
+| Framework       | Next.js 15 App Router      |
+| Language        | TypeScript (strict)        |
+| Database        | PostgreSQL via Neon        |
+| ORM             | Prisma 6                   |
+| Auth            | Auth.js v5 (NextAuth)      |
+| Background jobs | Inngest                    |
+| Email           | Resend + React Email       |
+| Files           | UploadThing                |
+| PDF             | `@react-pdf/renderer`      |
+| Rate limiting   | Upstash Ratelimit          |
+| Components      | shadcn/ui (heavily themed) |
+| Editor          | Tiptap v2                  |
+| Forms           | react-hook-form + zod      |
+| Validation      | zod (shared client/server) |
+| Search          | Postgres `pg_trgm`         |
+| Hosting         | Vercel                     |
+| Package manager | pnpm                       |
+| Testing         | Vitest + Playwright        |
+| Error tracking  | Sentry                     |
+| Analytics       | Plausible                  |
+| FX              | exchangerate.host          |
 
 ## Rationale per choice
 

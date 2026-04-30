@@ -56,17 +56,17 @@ Security reports go to `hello@middlemist.app`. The current author monitors the i
 
 ## Pointer table
 
-| Topic | Doc |
-|---|---|
-| Authentication and password handling | `docs/security/authentication.md` |
-| Magic-link tokens (client portal, password reset) | `docs/security/magic-links.md` |
-| Authorization and the freelancer/portal boundary | `docs/security/authorization.md` |
-| Rate limits per route and per actor | `docs/security/rate-limiting.md` |
-| Input validation conventions | `docs/security/input-validation.md` |
-| XSS surfaces and sanitization | `docs/security/xss-and-sanitization.md` |
-| CSRF posture and webhook signature verification | `docs/security/csrf.md` |
-| Secrets, environment variables, rotation | `docs/security/secrets-and-env.md` |
-| PII, retention, deletion, export | `docs/security/data-protection.md` |
-| Multi-tenancy enforcement | `docs/architecture/multi-tenancy.md` |
-| Public links (proposal, invoice, portal entry) | `docs/architecture/public-links.md` |
-| Audit log shape and writing conventions | `docs/architecture/audit-log.md` |
+| Topic                                             | Doc                                     |
+| ------------------------------------------------- | --------------------------------------- |
+| Authentication and password handling              | `docs/security/authentication.md`       |
+| Magic-link tokens (client portal, password reset) | `docs/security/magic-links.md`          |
+| Authorization and the freelancer/portal boundary  | `docs/security/authorization.md`        |
+| Rate limits per route and per actor               | `docs/security/rate-limiting.md`        |
+| Input validation conventions                      | `docs/security/input-validation.md`     |
+| XSS surfaces and sanitization                     | `docs/security/xss-and-sanitization.md` |
+| CSRF posture and webhook signature verification   | `docs/security/csrf.md`                 |
+| Secrets, environment variables, rotation          | `docs/security/secrets-and-env.md`      |
+| PII, retention, deletion, export                  | `docs/security/data-protection.md`      |
+| Multi-tenancy enforcement                         | `docs/architecture/multi-tenancy.md`    |
+| Public links (proposal, invoice, portal entry)    | `docs/architecture/public-links.md`     |
+| Audit log shape and writing conventions           | `docs/architecture/audit-log.md`        |

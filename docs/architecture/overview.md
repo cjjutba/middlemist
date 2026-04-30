@@ -101,16 +101,16 @@ External services beyond the four above:
 
 ## Boundaries summary
 
-| Concern | Where it lives |
-|---|---|
-| Auth gate | Middleware |
-| Mutation entry | Server Actions (`*.action.ts`) |
-| Read entry | Server Components calling repo functions |
-| Webhook verification | Route handlers in `app/api/*/route.ts` |
-| Public document rendering | Pages outside `(app)` segment |
-| Background work | Inngest functions in `src/lib/inngest/functions/*.ts` |
-| Email sending | `src/lib/email/send.ts` |
-| File uploads | UploadThing handlers in `src/app/api/uploadthing/core.ts` |
-| Rate limiting | `src/lib/ratelimit.ts` called from middleware and route handlers |
+| Concern                   | Where it lives                                                   |
+| ------------------------- | ---------------------------------------------------------------- |
+| Auth gate                 | Middleware                                                       |
+| Mutation entry            | Server Actions (`*.action.ts`)                                   |
+| Read entry                | Server Components calling repo functions                         |
+| Webhook verification      | Route handlers in `app/api/*/route.ts`                           |
+| Public document rendering | Pages outside `(app)` segment                                    |
+| Background work           | Inngest functions in `src/lib/inngest/functions/*.ts`            |
+| Email sending             | `src/lib/email/send.ts`                                          |
+| File uploads              | UploadThing handlers in `src/app/api/uploadthing/core.ts`        |
+| Rate limiting             | `src/lib/ratelimit.ts` called from middleware and route handlers |
 
 The architecture is intentionally boring: one repo, one platform, one runtime, one ORM. The complexity is in the product, not the infrastructure.

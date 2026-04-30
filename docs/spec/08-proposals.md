@@ -38,15 +38,40 @@ Uses `Proposal`, `SavedBlock`, `SavedPricingItem`, `ProposalTemplate`. Relevant 
 
 ```ts
 type Block =
-  | { type: "heading", id: string, level: 1 | 2 | 3, text: string }
-  | { type: "text", id: string, doc: TiptapDoc }
-  | { type: "scope", id: string, items: { id: string, title: string, description?: string }[] }
-  | { type: "deliverables", id: string, items: { id: string, title: string, description?: string }[] }
-  | { type: "timeline", id: string, items: { id: string, label: string, dateRange: { from: string, to?: string } | { description: string } }[] }
-  | { type: "pricing", id: string, items: { id: string, description: string, quantity: number, unitPrice: number, total: number, currency: Currency, savedPricingItemId?: string }[], showTotals: boolean }
-  | { type: "terms", id: string, doc: TiptapDoc }
-  | { type: "signature", id: string, prompt?: string }
-  | { type: "image", id: string, url: string, caption?: string };
+  | { type: 'heading'; id: string; level: 1 | 2 | 3; text: string }
+  | { type: 'text'; id: string; doc: TiptapDoc }
+  | { type: 'scope'; id: string; items: { id: string; title: string; description?: string }[] }
+  | {
+      type: 'deliverables';
+      id: string;
+      items: { id: string; title: string; description?: string }[];
+    }
+  | {
+      type: 'timeline';
+      id: string;
+      items: {
+        id: string;
+        label: string;
+        dateRange: { from: string; to?: string } | { description: string };
+      }[];
+    }
+  | {
+      type: 'pricing';
+      id: string;
+      items: {
+        id: string;
+        description: string;
+        quantity: number;
+        unitPrice: number;
+        total: number;
+        currency: Currency;
+        savedPricingItemId?: string;
+      }[];
+      showTotals: boolean;
+    }
+  | { type: 'terms'; id: string; doc: TiptapDoc }
+  | { type: 'signature'; id: string; prompt?: string }
+  | { type: 'image'; id: string; url: string; caption?: string };
 ```
 
 Status enum: `draft | sent | viewed | accepted | declined | expired`.
@@ -145,20 +170,20 @@ States: expired/declined/accepted views render the proposal but with the CTA reg
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `createProposal` | `createProposalSchema` (clientId, projectId?, templateId?, title) | `{ ok: true, data: { id } }` | Inserts draft; generates `publicToken`. Writes audit. |
-| `updateProposal` | `updateProposalSchema` (id, blocksJson?, title?, validUntil?) | `{ ok: true, data: Proposal }` | Recomputes `totalAmount`; auto-saved by editor. |
-| `sendProposal` | `{ id, validUntil? }` | `{ ok: true, data: Proposal }` | Transitions to `sent`, sets `sentAt` and `validUntil`. Emits `proposal.sent`. Writes audit. |
-| `regenerateProposalToken` | `{ id }` | `{ ok: true, data: { newToken } }` | New nanoid(21); writes audit. |
-| `expireProposal` | `{ id }` | `{ ok: true }` | Used by cron. Status → `expired`. |
-| `convertProposalToProject` | `{ proposalId }` | `{ ok: true, data: { projectId } }` | Inserts a Project; sets `Proposal.projectId`. Writes audit. |
-| `saveBlock` | `{ name, blockJson }` | `{ ok: true, data: { id } }` | Inserts SavedBlock. |
-| `saveAsTemplate` | `{ proposalId, name, defaultValidDays? }` | `{ ok: true, data: { id } }` | Copies the proposal's blocks into a `ProposalTemplate`. |
-| `savePricingItem` | `{ name, description?, rate, currency }` | `{ ok: true, data: { id } }` | Inserts SavedPricingItem. |
-| `acceptProposalPublic` | `{ token, signatureName }` (no auth) | `{ ok: true, data: { projectId? } }` | Public action; rate-limited. Validates status, captures signature/IP/UA, transitions, optionally converts to project. |
-| `declineProposalPublic` | `{ token, reason? }` (no auth) | `{ ok: true }` | Public action; rate-limited. Transitions to declined. |
-| `deleteProposal` | `{ id }` | `{ ok: true }` | Hard deletes a draft. Sent/accepted/declined proposals cannot be deleted (use status). |
+| Action                     | Input                                                             | Output                               | Side effects                                                                                                          |
+| -------------------------- | ----------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `createProposal`           | `createProposalSchema` (clientId, projectId?, templateId?, title) | `{ ok: true, data: { id } }`         | Inserts draft; generates `publicToken`. Writes audit.                                                                 |
+| `updateProposal`           | `updateProposalSchema` (id, blocksJson?, title?, validUntil?)     | `{ ok: true, data: Proposal }`       | Recomputes `totalAmount`; auto-saved by editor.                                                                       |
+| `sendProposal`             | `{ id, validUntil? }`                                             | `{ ok: true, data: Proposal }`       | Transitions to `sent`, sets `sentAt` and `validUntil`. Emits `proposal.sent`. Writes audit.                           |
+| `regenerateProposalToken`  | `{ id }`                                                          | `{ ok: true, data: { newToken } }`   | New nanoid(21); writes audit.                                                                                         |
+| `expireProposal`           | `{ id }`                                                          | `{ ok: true }`                       | Used by cron. Status → `expired`.                                                                                     |
+| `convertProposalToProject` | `{ proposalId }`                                                  | `{ ok: true, data: { projectId } }`  | Inserts a Project; sets `Proposal.projectId`. Writes audit.                                                           |
+| `saveBlock`                | `{ name, blockJson }`                                             | `{ ok: true, data: { id } }`         | Inserts SavedBlock.                                                                                                   |
+| `saveAsTemplate`           | `{ proposalId, name, defaultValidDays? }`                         | `{ ok: true, data: { id } }`         | Copies the proposal's blocks into a `ProposalTemplate`.                                                               |
+| `savePricingItem`          | `{ name, description?, rate, currency }`                          | `{ ok: true, data: { id } }`         | Inserts SavedPricingItem.                                                                                             |
+| `acceptProposalPublic`     | `{ token, signatureName }` (no auth)                              | `{ ok: true, data: { projectId? } }` | Public action; rate-limited. Validates status, captures signature/IP/UA, transitions, optionally converts to project. |
+| `declineProposalPublic`    | `{ token, reason? }` (no auth)                                    | `{ ok: true }`                       | Public action; rate-limited. Transitions to declined.                                                                 |
+| `deleteProposal`           | `{ id }`                                                          | `{ ok: true }`                       | Hard deletes a draft. Sent/accepted/declined proposals cannot be deleted (use status).                                |
 
 ## Repository Functions
 

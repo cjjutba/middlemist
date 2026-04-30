@@ -26,7 +26,7 @@ The "suggested prompt" is a starting point. Most weeks will need 2-3 sessions to
 
 ## How to update this plan
 
-Mark a week complete by changing the heading from "Week N" to "Week N (Complete)" and adding a one-line summary at the top of the week's section. Note slippage explicitly: "Originally targeted week N; completed week N+1 due to ___." Do not silently roll work into the next week.
+Mark a week complete by changing the heading from "Week N" to "Week N (Complete)" and adding a one-line summary at the top of the week's section. Note slippage explicitly: "Originally targeted week N; completed week N+1 due to \_\_\_." Do not silently roll work into the next week.
 
 ## Phase 1 — Foundation (weeks 1-3)
 

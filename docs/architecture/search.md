@@ -16,13 +16,13 @@ The cost is that ranking is naive (similarity score plus a few hand-tuned weight
 
 Cmd+K searches across:
 
-| Entity | Fields |
-|---|---|
-| Client | `name`, `companyName`, `email` |
-| Project | `name`, `description` |
-| Proposal | `title` |
-| Invoice | `number` |
-| Task | `title`, `description` |
+| Entity   | Fields                         |
+| -------- | ------------------------------ |
+| Client   | `name`, `companyName`, `email` |
+| Project  | `name`, `description`          |
+| Proposal | `title`                        |
+| Invoice  | `number`                       |
+| Task     | `title`, `description`         |
 
 Each result links to the relevant page. Entity-specific filters on list pages (clients, projects, invoices) reuse the same trigram-indexed columns.
 
@@ -99,14 +99,14 @@ The search service runs a tenant-scoped query against each entity in parallel an
 
 ```typescript
 // src/lib/services/search.service.ts
-import { prisma } from "@/lib/prisma";
+import { prisma } from '@/lib/prisma';
 
 type SearchHit =
-  | { type: "client"; id: string; primary: string; secondary: string }
-  | { type: "project"; id: string; primary: string; secondary: string }
-  | { type: "proposal"; id: string; primary: string; secondary: string }
-  | { type: "invoice"; id: string; primary: string; secondary: string }
-  | { type: "task"; id: string; primary: string; secondary: string };
+  | { type: 'client'; id: string; primary: string; secondary: string }
+  | { type: 'project'; id: string; primary: string; secondary: string }
+  | { type: 'proposal'; id: string; primary: string; secondary: string }
+  | { type: 'invoice'; id: string; primary: string; secondary: string }
+  | { type: 'task'; id: string; primary: string; secondary: string };
 
 export async function search(userId: string, query: string): Promise<SearchHit[]> {
   if (query.trim().length < 2) return [];
@@ -119,9 +119,9 @@ export async function search(userId: string, query: string): Promise<SearchHit[]
         userId,
         archivedAt: null,
         OR: [
-          { name: { contains: q, mode: "insensitive" } },
-          { companyName: { contains: q, mode: "insensitive" } },
-          { email: { contains: q, mode: "insensitive" } },
+          { name: { contains: q, mode: 'insensitive' } },
+          { companyName: { contains: q, mode: 'insensitive' } },
+          { email: { contains: q, mode: 'insensitive' } },
         ],
       },
       take: 4,
@@ -132,20 +132,20 @@ export async function search(userId: string, query: string): Promise<SearchHit[]
         userId,
         archivedAt: null,
         OR: [
-          { name: { contains: q, mode: "insensitive" } },
-          { description: { contains: q, mode: "insensitive" } },
+          { name: { contains: q, mode: 'insensitive' } },
+          { description: { contains: q, mode: 'insensitive' } },
         ],
       },
       take: 4,
       include: { client: { select: { name: true } } },
     }),
     prisma.proposal.findMany({
-      where: { userId, title: { contains: q, mode: "insensitive" } },
+      where: { userId, title: { contains: q, mode: 'insensitive' } },
       take: 4,
       include: { client: { select: { name: true } } },
     }),
     prisma.invoice.findMany({
-      where: { userId, number: { contains: q, mode: "insensitive" } },
+      where: { userId, number: { contains: q, mode: 'insensitive' } },
       take: 4,
       include: { client: { select: { name: true } } },
     }),
@@ -153,8 +153,8 @@ export async function search(userId: string, query: string): Promise<SearchHit[]
       where: {
         userId,
         OR: [
-          { title: { contains: q, mode: "insensitive" } },
-          { description: { contains: q, mode: "insensitive" } },
+          { title: { contains: q, mode: 'insensitive' } },
+          { description: { contains: q, mode: 'insensitive' } },
         ],
       },
       take: 4,
@@ -164,31 +164,31 @@ export async function search(userId: string, query: string): Promise<SearchHit[]
 
   const hits: SearchHit[] = [
     ...clients.map((c) => ({
-      type: "client" as const,
+      type: 'client' as const,
       id: c.id,
       primary: c.name,
       secondary: c.companyName ?? c.email,
     })),
     ...projects.map((p) => ({
-      type: "project" as const,
+      type: 'project' as const,
       id: p.id,
       primary: p.name,
       secondary: p.client.name,
     })),
     ...proposals.map((p) => ({
-      type: "proposal" as const,
+      type: 'proposal' as const,
       id: p.id,
       primary: p.title,
       secondary: p.client.name,
     })),
     ...invoices.map((i) => ({
-      type: "invoice" as const,
+      type: 'invoice' as const,
       id: i.id,
       primary: i.number,
       secondary: i.client.name,
     })),
     ...tasks.map((t) => ({
-      type: "task" as const,
+      type: 'task' as const,
       id: t.id,
       primary: t.title,
       secondary: t.project.name,

@@ -17,8 +17,8 @@ A `Money` helper type is defined and used at the application boundary:
 
 ```typescript
 // src/lib/money/types.ts
-import { Decimal } from "@prisma/client/runtime/library";
-import { Currency } from "@prisma/client";
+import { Decimal } from '@prisma/client/runtime/library';
+import { Currency } from '@prisma/client';
 
 export type Money = { amount: Decimal; currency: Currency };
 
@@ -65,21 +65,21 @@ The Inngest cron `fx.refresh` runs daily at 06:00 UTC. The handler:
 
 ```typescript
 // src/lib/inngest/functions/fx-refresh.ts
-import { inngest } from "@/lib/inngest/client";
-import { prisma } from "@/lib/prisma";
-import { Currency } from "@prisma/client";
+import { inngest } from '@/lib/inngest/client';
+import { prisma } from '@/lib/prisma';
+import { Currency } from '@prisma/client';
 
-const SUPPORTED: Currency[] = ["PHP", "USD", "EUR", "GBP", "AUD", "CAD"];
+const SUPPORTED: Currency[] = ['PHP', 'USD', 'EUR', 'GBP', 'AUD', 'CAD'];
 
 export const fxRefresh = inngest.createFunction(
-  { id: "fx-refresh" },
-  { cron: "0 6 * * *" },
+  { id: 'fx-refresh' },
+  { cron: '0 6 * * *' },
   async ({ step }) => {
     for (const base of SUPPORTED) {
-      const quotes = SUPPORTED.filter((c) => c !== base).join(",");
+      const quotes = SUPPORTED.filter((c) => c !== base).join(',');
       const json = (await step.run(`fetch-${base}`, async () => {
         const res = await fetch(
-          `https://api.exchangerate.host/latest?base=${base}&symbols=${quotes}`
+          `https://api.exchangerate.host/latest?base=${base}&symbols=${quotes}`,
         );
         if (!res.ok) throw new Error(`exchangerate.host returned ${res.status}`);
         return res.json();
@@ -96,7 +96,7 @@ export const fxRefresh = inngest.createFunction(
       }
     }
     return { ok: true };
-  }
+  },
 );
 ```
 
@@ -123,10 +123,10 @@ model FxRate {
 
 ```typescript
 // src/lib/services/fx.service.ts
-import { Decimal } from "@prisma/client/runtime/library";
-import { Currency } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
-import { Money } from "@/lib/money/types";
+import { Decimal } from '@prisma/client/runtime/library';
+import { Currency } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { Money } from '@/lib/money/types';
 
 export const fxService = {
   async convert(amount: Money, to: Currency): Promise<Money> {
@@ -136,7 +136,7 @@ export const fxService = {
     });
     if (!rate) {
       throw new Error(
-        `No FX rate available for ${amount.currency} -> ${to}; refresh may be lagging`
+        `No FX rate available for ${amount.currency} -> ${to}; refresh may be lagging`,
       );
     }
     const converted = amount.amount.mul(rate.rate);
@@ -145,7 +145,7 @@ export const fxService = {
 
   async isStale(): Promise<boolean> {
     const latest = await prisma.fxRate.findFirst({
-      orderBy: { fetchedAt: "desc" },
+      orderBy: { fetchedAt: 'desc' },
       select: { fetchedAt: true },
     });
     if (!latest) return true;
@@ -162,12 +162,12 @@ function decimalsFor(currency: Currency): number {
   // Banker's rounding to standard decimal places for each currency.
   // All v1 supported currencies use 2 decimals.
   switch (currency) {
-    case "PHP":
-    case "USD":
-    case "EUR":
-    case "GBP":
-    case "AUD":
-    case "CAD":
+    case 'PHP':
+    case 'USD':
+    case 'EUR':
+    case 'GBP':
+    case 'AUD':
+    case 'CAD':
       return 2;
   }
 }

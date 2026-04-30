@@ -29,7 +29,7 @@ function process(input: any) {
 }
 
 // CORRECT
-import { z } from "zod";
+import { z } from 'zod';
 const inputSchema = z.object({ value: z.string() });
 
 function process(rawInput: unknown) {
@@ -42,7 +42,7 @@ The boundary cast is acceptable when a third-party library has wrong types and t
 
 ```typescript
 // at the boundary
-import { someUntypedHelper } from "third-party";
+import { someUntypedHelper } from 'third-party';
 const helper = someUntypedHelper as (x: string) => Promise<string>;
 ```
 
@@ -51,29 +51,29 @@ const helper = someUntypedHelper as (x: string) => Promise<string>;
 External imports first, then `@/` internal imports, then relative imports. One blank line between groups. ESLint enforces it through `eslint-plugin-import`.
 
 ```typescript
-import { z } from "zod";
-import { redirect } from "next/navigation";
+import { z } from 'zod';
+import { redirect } from 'next/navigation';
 
-import { withAuth } from "@/lib/auth/with-auth";
-import { clientsRepo } from "@/lib/repositories/clients.repo";
-import { createClientSchema } from "@/lib/schemas/client.schema";
+import { withAuth } from '@/lib/auth/with-auth';
+import { clientsRepo } from '@/lib/repositories/clients.repo';
+import { createClientSchema } from '@/lib/schemas/client.schema';
 
-import { ClientForm } from "./ClientForm";
+import { ClientForm } from './ClientForm';
 ```
 
 The `@/` alias resolves to `src/`. Configured in `tsconfig.json` `paths` and in `next.config.ts`. Relative imports with two or more dots (`../../`) signal a misplaced file: prefer `@/`.
 
 ## Naming
 
-| Kind | Style | Example |
-|---|---|---|
-| Variables, functions, hooks, props | camelCase | `clientId`, `findById`, `useProposalDraft` |
-| React components, types, classes, enums, Prisma models | PascalCase | `ClientList`, `Project`, `AuditEntityType` |
-| Files | kebab-case | `clients.repo.ts`, `with-auth.ts` |
-| Component files | PascalCase | `ClientList.tsx` |
-| Constants | SCREAMING_SNAKE_CASE | `DEFAULT_PAGE_SIZE` |
-| Boolean variables | predicate form | `isPublished`, `hasDraft`, `canArchive` (never `published`, `draft`) |
-| Route segments | kebab-case | `/clients/new`, `/proposals/[id]/edit` |
+| Kind                                                   | Style                | Example                                                              |
+| ------------------------------------------------------ | -------------------- | -------------------------------------------------------------------- |
+| Variables, functions, hooks, props                     | camelCase            | `clientId`, `findById`, `useProposalDraft`                           |
+| React components, types, classes, enums, Prisma models | PascalCase           | `ClientList`, `Project`, `AuditEntityType`                           |
+| Files                                                  | kebab-case           | `clients.repo.ts`, `with-auth.ts`                                    |
+| Component files                                        | PascalCase           | `ClientList.tsx`                                                     |
+| Constants                                              | SCREAMING_SNAKE_CASE | `DEFAULT_PAGE_SIZE`                                                  |
+| Boolean variables                                      | predicate form       | `isPublished`, `hasDraft`, `canArchive` (never `published`, `draft`) |
+| Route segments                                         | kebab-case           | `/clients/new`, `/proposals/[id]/edit`                               |
 
 The boolean rule is the one that catches new contributors most often. `published` reads like a state name (the row's status); `isPublished` reads like a question (the answer is true or false). The rest of the code is easier to scan once predicates always look like predicates.
 
@@ -125,12 +125,12 @@ The full hierarchy lives in `docs/engineering/error-handling.md`.
 
 ```typescript
 // service throwing typed
-import { NotFoundError } from "@/lib/utils/errors";
+import { NotFoundError } from '@/lib/utils/errors';
 
 export const projectsService = {
   async transitionStatus(userId: string, id: string, to: ProjectStatus) {
     const project = await projectsRepo.findById(userId, id);
-    if (!project) throw new NotFoundError("Project not found");
+    if (!project) throw new NotFoundError('Project not found');
     if (!isValidTransition(project.status, to)) {
       throw new ValidationError(`Cannot transition from ${project.status} to ${to}`);
     }
@@ -145,18 +145,18 @@ export const transitionProjectStatus = withAuth(
   z.object({ id: z.string(), to: projectStatusSchema }),
   async (userId, input) => {
     return projectsService.transitionStatus(userId, input.id, input.to);
-  }
+  },
 );
 ```
 
 ```typescript
 // UI handling result
-const result = await transitionProjectStatus({ id, to: "active" });
+const result = await transitionProjectStatus({ id, to: 'active' });
 if (!result.ok) {
   toast.error(friendlyMessage(result.error));
   return;
 }
-toast.success("Project active");
+toast.success('Project active');
 ```
 
 `friendlyMessage` is a small map in `src/lib/utils/errors.ts`: it converts internal codes (`PROJECT_NOT_FOUND`, `RATE_LIMITED`) to user-facing strings (`"That project no longer exists."`, `"You're moving fast. Try again in a few seconds."`). Stack traces never reach the UI.
@@ -228,9 +228,9 @@ The action runs the same schema. Client-side validation is UX; server-side valid
 Storage is always UTC. Conversion to the user's timezone happens at presentation. The `User.defaultTimezone` column is set during onboarding and read on every request.
 
 ```typescript
-import { formatInTimeZone } from "date-fns-tz";
+import { formatInTimeZone } from 'date-fns-tz';
 
-formatInTimeZone(invoice.dueDate, user.defaultTimezone, "MMM d, yyyy");
+formatInTimeZone(invoice.dueDate, user.defaultTimezone, 'MMM d, yyyy');
 ```
 
 `Date.now()` is fine for "current time at this point in code" but is forbidden in business logic where a fake clock matters in tests. Use a clock service (`src/lib/utils/clock.ts`) for any time-dependent business rule:
@@ -249,18 +249,18 @@ if (proposal.validUntil < clock.now()) { ... }
 Currency is never a JavaScript `number`. Prisma's `Decimal` type is the canonical representation for stored amounts; in TypeScript, that maps to `Prisma.Decimal` (a thin wrapper around `decimal.js`). Arithmetic uses `Decimal` methods (`.add`, `.sub`, `.mul`, `.toFixed`).
 
 ```typescript
-import { Prisma } from "@prisma/client";
+import { Prisma } from '@prisma/client';
 
 const subtotal = lineItems.reduce(
   (acc, item) => acc.add(item.unitPrice.mul(item.quantity)),
-  new Prisma.Decimal(0)
+  new Prisma.Decimal(0),
 );
 ```
 
 Every monetary value is paired with an ISO 4217 currency code (`USD`, `PHP`, `EUR`, `GBP`, etc.). Formatting uses the explicit code:
 
 ```typescript
-import { formatMoney } from "@/lib/utils/money";
+import { formatMoney } from '@/lib/utils/money';
 
 formatMoney(invoice.total, invoice.currency); // "$1,250.00"
 ```
@@ -283,8 +283,8 @@ try {
 try {
   await thing();
 } catch (e) {
-  logger.error({ err: e }, "thing failed");
-  throw new IntegrationError("EXTERNAL_FAILURE");
+  logger.error({ err: e }, 'thing failed');
+  throw new IntegrationError('EXTERNAL_FAILURE');
 }
 ```
 

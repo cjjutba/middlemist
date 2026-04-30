@@ -62,17 +62,17 @@ model NotificationRead {
 
 ## What gets logged
 
-| Entity | Actions |
-|---|---|
-| User | `user.signup`, `user.login`, `user.password-changed`, `user.email-changed`, `user.account-deleted` |
-| Client | `client.created`, `client.updated`, `client.archived`, `client.unarchived` |
-| Project | `project.created`, `project.status-changed`, `project.archived`, `project.unarchived` |
-| Task | `task.created`, `task.status-changed`, `task.deleted` |
-| TimeEntry | `time-entry.created`, `time-entry.updated`, `time-entry.deleted`, `time-entry.invoiced` |
-| Update | `update.posted`, `update.edited`, `update.pinned`, `update.unpinned` |
-| Proposal | `proposal.created`, `proposal.sent`, `proposal.viewed`, `proposal.accepted`, `proposal.declined`, `proposal.expired`, `proposal.regenerated-token` |
-| Invoice | `invoice.created`, `invoice.sent`, `invoice.viewed`, `invoice.marked-paid`, `invoice.marked-void`, `invoice.overdue`, `invoice.regenerated-token`, `invoice.reminder-sent` |
-| File | `file.uploaded`, `file.deletion-pending` (used by the deletion lifecycle in `file-uploads.md`) |
+| Entity    | Actions                                                                                                                                                                    |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| User      | `user.signup`, `user.login`, `user.password-changed`, `user.email-changed`, `user.account-deleted`                                                                         |
+| Client    | `client.created`, `client.updated`, `client.archived`, `client.unarchived`                                                                                                 |
+| Project   | `project.created`, `project.status-changed`, `project.archived`, `project.unarchived`                                                                                      |
+| Task      | `task.created`, `task.status-changed`, `task.deleted`                                                                                                                      |
+| TimeEntry | `time-entry.created`, `time-entry.updated`, `time-entry.deleted`, `time-entry.invoiced`                                                                                    |
+| Update    | `update.posted`, `update.edited`, `update.pinned`, `update.unpinned`                                                                                                       |
+| Proposal  | `proposal.created`, `proposal.sent`, `proposal.viewed`, `proposal.accepted`, `proposal.declined`, `proposal.expired`, `proposal.regenerated-token`                         |
+| Invoice   | `invoice.created`, `invoice.sent`, `invoice.viewed`, `invoice.marked-paid`, `invoice.marked-void`, `invoice.overdue`, `invoice.regenerated-token`, `invoice.reminder-sent` |
+| File      | `file.uploaded`, `file.deletion-pending` (used by the deletion lifecycle in `file-uploads.md`)                                                                             |
 
 ## What does NOT get logged
 
@@ -158,8 +158,8 @@ A single helper:
 
 ```typescript
 // src/lib/audit/write.ts
-import { prisma } from "@/lib/prisma";
-import { actionRegistry } from "./registry";
+import { prisma } from '@/lib/prisma';
+import { actionRegistry } from './registry';
 
 type WriteAuditArgs = {
   userId: string | null;

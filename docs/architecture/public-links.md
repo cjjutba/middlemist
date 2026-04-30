@@ -88,27 +88,27 @@ Configured in middleware (or in route handlers for routes outside middleware's s
 
 ```typescript
 // src/lib/ratelimit.ts
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 const redis = Redis.fromEnv();
 
 export const publicViewLimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(30, "1 m"),
-  prefix: "rl:public-view",
+  limiter: Ratelimit.slidingWindow(30, '1 m'),
+  prefix: 'rl:public-view',
 });
 
 export const portalRedeemLimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(30, "1 m"),
-  prefix: "rl:portal-redeem",
+  limiter: Ratelimit.slidingWindow(30, '1 m'),
+  prefix: 'rl:portal-redeem',
 });
 
 export const portalRequestLimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(5, "1 m"),
-  prefix: "rl:portal-request",
+  limiter: Ratelimit.slidingWindow(5, '1 m'),
+  prefix: 'rl:portal-request',
 });
 ```
 
@@ -133,12 +133,12 @@ To revoke a portal session that has already been redeemed, the freelancer can re
 
 ## Expiry
 
-| Link type | Expires when |
-|---|---|
-| Proposal | `validUntil` (user-set) is past, or status is `expired`, `accepted`, or `declined` |
-| Invoice | Never (always viewable, even when paid) |
-| Magic-link token | 1 hour after issuance, or upon consumption |
-| Portal session | 7 days after redemption |
+| Link type        | Expires when                                                                       |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| Proposal         | `validUntil` (user-set) is past, or status is `expired`, `accepted`, or `declined` |
+| Invoice          | Never (always viewable, even when paid)                                            |
+| Magic-link token | 1 hour after issuance, or upon consumption                                         |
+| Portal session   | 7 days after redemption                                                            |
 
 Invoices remain viewable indefinitely on purpose: a client may want to look up an old invoice, and the document is a record of the transaction. Voiding an invoice changes its status to `void` but does not invalidate the URL; the URL renders the void invoice with a banner explaining its status.
 
@@ -148,8 +148,8 @@ Every public-link view writes an audit-log entry. The entry's metadata includes 
 
 ```typescript
 // in the public-route page component
-import { writeAudit } from "@/lib/audit/write";
-import { headers } from "next/headers";
+import { writeAudit } from '@/lib/audit/write';
+import { headers } from 'next/headers';
 
 const proposal = await proposalsRepo.findByPublicToken(token);
 if (!proposal) return notFound();
@@ -157,15 +157,15 @@ if (!proposal) return notFound();
 const h = await headers();
 await writeAudit({
   userId: null,
-  action: "proposal.viewed",
-  entityType: "proposal",
+  action: 'proposal.viewed',
+  entityType: 'proposal',
   entityId: proposal.id,
   metadata: {},
-  ip: h.get("x-forwarded-for") ?? undefined,
-  userAgent: h.get("user-agent") ?? undefined,
+  ip: h.get('x-forwarded-for') ?? undefined,
+  userAgent: h.get('user-agent') ?? undefined,
 });
 
-await inngest.send({ name: "proposal.viewed", data: { proposalId: proposal.id } });
+await inngest.send({ name: 'proposal.viewed', data: { proposalId: proposal.id } });
 ```
 
 The `proposal.viewed` Inngest handler then sets `viewedAt` if null, sends the freelancer's notification email, and writes the in-app notification (which is a derived view over the audit log; see `audit-log.md`).

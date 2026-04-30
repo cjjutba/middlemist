@@ -78,12 +78,12 @@ States: loading (skeleton rows), error (a small inline error with a retry link),
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `getNotifications` | `{ limit?: number }` | `{ ok: true, data: NotificationItem[] }` | Read-only; returns last N matching audit entries with read state. |
-| `getUnreadCount` | `{}` | `{ ok: true, data: { count: number } }` | Read-only. The polling target. Capped at "9+" client-side. |
-| `markNotificationRead` | `{ auditLogId }` | `{ ok: true }` | Inserts `NotificationRead` (idempotent on the unique constraint). |
-| `markAllNotificationsRead` | `{}` | `{ ok: true, data: { marked: number } }` | Inserts read rows for every currently-unread eligible entry in one transaction. |
+| Action                     | Input                | Output                                   | Side effects                                                                    |
+| -------------------------- | -------------------- | ---------------------------------------- | ------------------------------------------------------------------------------- |
+| `getNotifications`         | `{ limit?: number }` | `{ ok: true, data: NotificationItem[] }` | Read-only; returns last N matching audit entries with read state.               |
+| `getUnreadCount`           | `{}`                 | `{ ok: true, data: { count: number } }`  | Read-only. The polling target. Capped at "9+" client-side.                      |
+| `markNotificationRead`     | `{ auditLogId }`     | `{ ok: true }`                           | Inserts `NotificationRead` (idempotent on the unique constraint).               |
+| `markAllNotificationsRead` | `{}`                 | `{ ok: true, data: { marked: number } }` | Inserts read rows for every currently-unread eligible entry in one transaction. |
 
 ## Repository Functions
 
@@ -98,13 +98,13 @@ The allowlist is centralized in `src/lib/notifications/allowlist.ts` so both the
 
 ```ts
 export const NOTIFIABLE_ACTIONS = [
-  "proposal.viewed",
-  "proposal.accepted",
-  "proposal.declined",
-  "invoice.viewed",
-  "invoice.marked-paid",
-  "invoice.overdue",
-  "client.magic-link-redeemed",
+  'proposal.viewed',
+  'proposal.accepted',
+  'proposal.declined',
+  'invoice.viewed',
+  'invoice.marked-paid',
+  'invoice.overdue',
+  'client.magic-link-redeemed',
 ] as const;
 ```
 

@@ -69,14 +69,14 @@ Uses `User` (see `docs/architecture/data-model.md`). Relevant columns: `id`, `em
 
 All auth pages share a centered narrow column (max-width 400px), `{colors.canvas}` background, the wordmark at the top in `{typography.title-lg}`, the page heading in `{typography.display-md}`, supporting copy in `{typography.body-md}` `{colors.body}`. Form fields use `{component.text-input}` (full width on auth pages). Primary action is `{component.button-primary}` (full width). Bottom of every auth page: `{component.button-text-link}` for the alternate flow ("Already have an account? Sign in"). Footer is `{component.footer}` (dark surface) on auth pages.
 
-| Route | Access | Key elements |
-|---|---|---|
-| `/signup` | Public | Email, password, name fields; submit; link to login. Empty state on success ("check your email"). |
-| `/login` | Public | Email, password; submit; link to signup; link to forgot password. Surfaces "verify email" prompt if applicable. |
-| `/verify-email/[token]` | Public | Server-validated landing; redirects to onboarding on success; "expired" state with resend button on failure. |
-| `/forgot-password` | Public | Email field; always returns success view to prevent enumeration. |
-| `/reset-password/[token]` | Public | New password and confirm fields; submit redirects to login. "Expired" state on invalid token. |
-| `/(app)/settings/account` | Authenticated | Profile section, password change section, email change section, danger zone (delete account). |
+| Route                     | Access        | Key elements                                                                                                    |
+| ------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------- |
+| `/signup`                 | Public        | Email, password, name fields; submit; link to login. Empty state on success ("check your email").               |
+| `/login`                  | Public        | Email, password; submit; link to signup; link to forgot password. Surfaces "verify email" prompt if applicable. |
+| `/verify-email/[token]`   | Public        | Server-validated landing; redirects to onboarding on success; "expired" state with resend button on failure.    |
+| `/forgot-password`        | Public        | Email field; always returns success view to prevent enumeration.                                                |
+| `/reset-password/[token]` | Public        | New password and confirm fields; submit redirects to login. "Expired" state on invalid token.                   |
+| `/(app)/settings/account` | Authenticated | Profile section, password change section, email change section, danger zone (delete account).                   |
 
 States to handle:
 
@@ -87,20 +87,20 @@ States to handle:
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `signup` | `signupSchema` (email, password, name) | `{ ok: true, data: { id } }` | Creates `User`; emits `user.signup`; sends verify email; writes `user.signup` audit. |
-| `requestEmailVerification` | `{ email }` | `{ ok: true }` | Re-issues verification token; sends verify email. Rate-limited 5/hour per email. |
-| `verifyEmail` | `{ token }` | `{ ok: true }` | Sets `emailVerifiedAt`; redirects to onboarding. |
-| `login` | `loginSchema` (email, password) | `{ ok: true, data: { sessionExpiresAt } }` | Issues session cookie; writes `user.login` audit. |
-| `requestPasswordReset` | `{ email }` | `{ ok: true }` | Issues reset token if user exists; sends `password-reset` email. Always returns success. Rate-limited 5/hour per email. |
-| `resetPassword` | `{ token, newPassword }` | `{ ok: true }` | Updates `passwordHash`; invalidates all sessions; writes `user.password-changed` audit. |
-| `updateProfile` | `updateProfileSchema` | `{ ok: true, data: User }` | Updates non-credential fields. |
-| `changePassword` | `{ currentPassword, newPassword }` | `{ ok: true }` | Verifies current password; updates hash; invalidates sessions other than current; writes audit. |
-| `requestEmailChange` | `{ newEmail }` | `{ ok: true }` | Sends verify email to new address; does not change email yet. |
-| `verifyEmailChange` | `{ token }` | `{ ok: true }` | Updates `User.email`; writes `user.email-changed` audit; invalidates sessions. |
-| `requestAccountDeletion` | `{}` | `{ ok: true, data: { deletedAt } }` | Sets `User.deletedAt = now + 30 days`; emails JSON export; writes audit. |
-| `cancelAccountDeletion` | `{}` | `{ ok: true }` | Clears `User.deletedAt`. |
+| Action                     | Input                                  | Output                                     | Side effects                                                                                                            |
+| -------------------------- | -------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `signup`                   | `signupSchema` (email, password, name) | `{ ok: true, data: { id } }`               | Creates `User`; emits `user.signup`; sends verify email; writes `user.signup` audit.                                    |
+| `requestEmailVerification` | `{ email }`                            | `{ ok: true }`                             | Re-issues verification token; sends verify email. Rate-limited 5/hour per email.                                        |
+| `verifyEmail`              | `{ token }`                            | `{ ok: true }`                             | Sets `emailVerifiedAt`; redirects to onboarding.                                                                        |
+| `login`                    | `loginSchema` (email, password)        | `{ ok: true, data: { sessionExpiresAt } }` | Issues session cookie; writes `user.login` audit.                                                                       |
+| `requestPasswordReset`     | `{ email }`                            | `{ ok: true }`                             | Issues reset token if user exists; sends `password-reset` email. Always returns success. Rate-limited 5/hour per email. |
+| `resetPassword`            | `{ token, newPassword }`               | `{ ok: true }`                             | Updates `passwordHash`; invalidates all sessions; writes `user.password-changed` audit.                                 |
+| `updateProfile`            | `updateProfileSchema`                  | `{ ok: true, data: User }`                 | Updates non-credential fields.                                                                                          |
+| `changePassword`           | `{ currentPassword, newPassword }`     | `{ ok: true }`                             | Verifies current password; updates hash; invalidates sessions other than current; writes audit.                         |
+| `requestEmailChange`       | `{ newEmail }`                         | `{ ok: true }`                             | Sends verify email to new address; does not change email yet.                                                           |
+| `verifyEmailChange`        | `{ token }`                            | `{ ok: true }`                             | Updates `User.email`; writes `user.email-changed` audit; invalidates sessions.                                          |
+| `requestAccountDeletion`   | `{}`                                   | `{ ok: true, data: { deletedAt } }`        | Sets `User.deletedAt = now + 30 days`; emails JSON export; writes audit.                                                |
+| `cancelAccountDeletion`    | `{}`                                   | `{ ok: true }`                             | Clears `User.deletedAt`.                                                                                                |
 
 ## Repository Functions
 

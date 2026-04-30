@@ -77,23 +77,23 @@ The graph is conservative: it lists the major dependencies that determine build 
 
 ## Summary table
 
-| # | Module | One-sentence purpose |
-|---|---|---|
-| 01 | Auth and account | Email/password authentication, email verification, password reset, account profile, soft-delete with grace period. |
-| 02 | Onboarding | Skippable first-login walkthrough that captures business name, logo, default currency, and the first client. |
-| 03 | Clients | Manage client records with contact details, currency preference, archive, and email-bounce flag. |
-| 04 | Projects | The central object: every task, time entry, update, proposal, and invoice attaches to one project. |
-| 05 | Tasks | Track work items inside a project across list, kanban, and calendar views, plus a cross-project Today view. |
-| 06 | Time tracking | One running timer at a time, manual entries, weekly summary, optional client visibility per project. |
-| 07 | Updates | Per-project status updates with rich text and attachments, optional client email on post. |
-| 08 | Proposals | Block-based proposal builder with public-link viewer, accept/decline flow, and PDF export. |
-| 09 | Invoices | Multi-currency invoices with line items, public viewer, reminder cron, manual mark-as-paid, and PDF export. |
-| 10 | Client portal | Magic-link, read-only client surface scoped to one freelancer/client pair. |
-| 11 | Dashboard | Freelancer's home page: today's tasks, active projects, recent activity, quick stats, quick actions. |
-| 12 | Settings | All user-configurable settings, organized into profile / business / email / reminders / branding / data / account. |
-| 13 | Global search | Cmd+K command palette across clients, projects, proposals, invoices, and tasks, plus quick actions. |
-| 14 | In-app notifications | Bell icon with audit-derived feed and per-row read state. |
-| 15 | Email customization | Per-user override of subject, body, signature, and from-name on customizable transactional emails. |
+| #   | Module               | One-sentence purpose                                                                                               |
+| --- | -------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 01  | Auth and account     | Email/password authentication, email verification, password reset, account profile, soft-delete with grace period. |
+| 02  | Onboarding           | Skippable first-login walkthrough that captures business name, logo, default currency, and the first client.       |
+| 03  | Clients              | Manage client records with contact details, currency preference, archive, and email-bounce flag.                   |
+| 04  | Projects             | The central object: every task, time entry, update, proposal, and invoice attaches to one project.                 |
+| 05  | Tasks                | Track work items inside a project across list, kanban, and calendar views, plus a cross-project Today view.        |
+| 06  | Time tracking        | One running timer at a time, manual entries, weekly summary, optional client visibility per project.               |
+| 07  | Updates              | Per-project status updates with rich text and attachments, optional client email on post.                          |
+| 08  | Proposals            | Block-based proposal builder with public-link viewer, accept/decline flow, and PDF export.                         |
+| 09  | Invoices             | Multi-currency invoices with line items, public viewer, reminder cron, manual mark-as-paid, and PDF export.        |
+| 10  | Client portal        | Magic-link, read-only client surface scoped to one freelancer/client pair.                                         |
+| 11  | Dashboard            | Freelancer's home page: today's tasks, active projects, recent activity, quick stats, quick actions.               |
+| 12  | Settings             | All user-configurable settings, organized into profile / business / email / reminders / branding / data / account. |
+| 13  | Global search        | Cmd+K command palette across clients, projects, proposals, invoices, and tasks, plus quick actions.                |
+| 14  | In-app notifications | Bell icon with audit-derived feed and per-row read state.                                                          |
+| 15  | Email customization  | Per-user override of subject, body, signature, and from-name on customizable transactional emails.                 |
 
 ## Cross-module concerns
 

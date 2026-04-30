@@ -8,21 +8,21 @@ This doc is the canonical type scale, the loading strategy, the pairing rules ac
 
 The scale is locked. Twelve tokens cover every surface in the product. Sizes use pixel values; line heights are unitless multipliers; letter-spacing is in pixels because the negative tracking on display sizes is the signature detail.
 
-| Token | Size | Weight | Line height | Letter-spacing | Use |
-|---|---|---|---|---|---|
-| `{typography.display-xl}` | 64px | 600 | 1.05 | -2px | Marketing h1 |
-| `{typography.display-lg}` | 48px | 600 | 1.1 | -1.5px | Section heads |
-| `{typography.display-md}` | 36px | 600 | 1.15 | -1px | Sub-section heads, card titles |
-| `{typography.display-sm}` | 28px | 600 | 1.2 | -0.5px | CTA-band heads, plan prices |
-| `{typography.title-lg}` | 22px | 600 | 1.3 | -0.3px | Plan names, page titles |
-| `{typography.title-md}` | 18px | 600 | 1.4 | 0 | Feature card titles |
-| `{typography.title-sm}` | 16px | 600 | 1.4 | 0 | Small card titles, list labels |
-| `{typography.body-md}` | 16px | 400 | 1.5 | 0 | Default running text |
-| `{typography.body-sm}` | 14px | 400 | 1.5 | 0 | Footer body, fine-print |
-| `{typography.caption}` | 13px | 500 | 1.4 | 0 | Badge labels, captions |
-| `{typography.code}` | 14px | 400 | 1.5 | 0 | Code, invoice numbers, IDs |
-| `{typography.button}` | 14px | 600 | 1.0 | 0 | Standard button labels |
-| `{typography.nav-link}` | 14px | 500 | 1.4 | 0 | Top-nav menu items |
+| Token                     | Size | Weight | Line height | Letter-spacing | Use                            |
+| ------------------------- | ---- | ------ | ----------- | -------------- | ------------------------------ |
+| `{typography.display-xl}` | 64px | 600    | 1.05        | -2px           | Marketing h1                   |
+| `{typography.display-lg}` | 48px | 600    | 1.1         | -1.5px         | Section heads                  |
+| `{typography.display-md}` | 36px | 600    | 1.15        | -1px           | Sub-section heads, card titles |
+| `{typography.display-sm}` | 28px | 600    | 1.2         | -0.5px         | CTA-band heads, plan prices    |
+| `{typography.title-lg}`   | 22px | 600    | 1.3         | -0.3px         | Plan names, page titles        |
+| `{typography.title-md}`   | 18px | 600    | 1.4         | 0              | Feature card titles            |
+| `{typography.title-sm}`   | 16px | 600    | 1.4         | 0              | Small card titles, list labels |
+| `{typography.body-md}`    | 16px | 400    | 1.5         | 0              | Default running text           |
+| `{typography.body-sm}`    | 14px | 400    | 1.5         | 0              | Footer body, fine-print        |
+| `{typography.caption}`    | 13px | 500    | 1.4         | 0              | Badge labels, captions         |
+| `{typography.code}`       | 14px | 400    | 1.5         | 0              | Code, invoice numbers, IDs     |
+| `{typography.button}`     | 14px | 600    | 1.0         | 0              | Standard button labels         |
+| `{typography.nav-link}`   | 14px | 500    | 1.4         | 0              | Top-nav menu items             |
 
 Display tokens use Inter Display at weight 600. Title, body, caption, button, and nav-link tokens use Inter. Code uses JetBrains Mono. The boundaries between voices are non-negotiable: a body paragraph is never set in Inter Display, a display heading is never set in plain Inter without negative letter-spacing.
 
@@ -87,30 +87,30 @@ Note: `Inter_Tight` is the closest available `next/font/google` family for "Inte
 
 ```typescript
 // tailwind.config.ts (excerpt)
-import type { Config } from "tailwindcss";
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-display)", "ui-sans-serif", "system-ui"],
-        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui"],
-        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+        display: ['var(--font-display)', 'ui-sans-serif', 'system-ui'],
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
       fontSize: {
-        "display-xl": ["64px", { lineHeight: "1.05", letterSpacing: "-2px", fontWeight: "600" }],
-        "display-lg": ["48px", { lineHeight: "1.1", letterSpacing: "-1.5px", fontWeight: "600" }],
-        "display-md": ["36px", { lineHeight: "1.15", letterSpacing: "-1px", fontWeight: "600" }],
-        "display-sm": ["28px", { lineHeight: "1.2", letterSpacing: "-0.5px", fontWeight: "600" }],
-        "title-lg": ["22px", { lineHeight: "1.3", letterSpacing: "-0.3px", fontWeight: "600" }],
-        "title-md": ["18px", { lineHeight: "1.4", letterSpacing: "0", fontWeight: "600" }],
-        "title-sm": ["16px", { lineHeight: "1.4", letterSpacing: "0", fontWeight: "600" }],
-        "body-md": ["16px", { lineHeight: "1.5", letterSpacing: "0", fontWeight: "400" }],
-        "body-sm": ["14px", { lineHeight: "1.5", letterSpacing: "0", fontWeight: "400" }],
-        "caption": ["13px", { lineHeight: "1.4", letterSpacing: "0", fontWeight: "500" }],
-        "code": ["14px", { lineHeight: "1.5", letterSpacing: "0", fontWeight: "400" }],
-        "button": ["14px", { lineHeight: "1.0", letterSpacing: "0", fontWeight: "600" }],
-        "nav-link": ["14px", { lineHeight: "1.4", letterSpacing: "0", fontWeight: "500" }],
+        'display-xl': ['64px', { lineHeight: '1.05', letterSpacing: '-2px', fontWeight: '600' }],
+        'display-lg': ['48px', { lineHeight: '1.1', letterSpacing: '-1.5px', fontWeight: '600' }],
+        'display-md': ['36px', { lineHeight: '1.15', letterSpacing: '-1px', fontWeight: '600' }],
+        'display-sm': ['28px', { lineHeight: '1.2', letterSpacing: '-0.5px', fontWeight: '600' }],
+        'title-lg': ['22px', { lineHeight: '1.3', letterSpacing: '-0.3px', fontWeight: '600' }],
+        'title-md': ['18px', { lineHeight: '1.4', letterSpacing: '0', fontWeight: '600' }],
+        'title-sm': ['16px', { lineHeight: '1.4', letterSpacing: '0', fontWeight: '600' }],
+        'body-md': ['16px', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }],
+        'body-sm': ['14px', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }],
+        caption: ['13px', { lineHeight: '1.4', letterSpacing: '0', fontWeight: '500' }],
+        code: ['14px', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }],
+        button: ['14px', { lineHeight: '1.0', letterSpacing: '0', fontWeight: '600' }],
+        'nav-link': ['14px', { lineHeight: '1.4', letterSpacing: '0', fontWeight: '500' }],
       },
     },
   },
@@ -122,7 +122,9 @@ export default config;
 A display headline in JSX therefore reads:
 
 ```tsx
-<h1 className="font-display text-display-lg text-ink">Stop chasing freelance work across six tools.</h1>
+<h1 className="font-display text-display-lg text-ink">
+  Stop chasing freelance work across six tools.
+</h1>
 ```
 
 The class `font-display` selects the Inter Display family; `text-display-lg` carries the size, line-height, letter-spacing, and weight together.

@@ -4,19 +4,19 @@ Middlemist holds personally identifiable information (PII) in five entity classe
 
 ## PII inventory
 
-| Entity | Field | Why stored |
-|---|---|---|
-| `User` | `email` | Account identifier and Reply-To on outbound mail. |
-| `User` | `name`, `businessName`, `businessAddress`, `businessTaxId` | Rendered on proposals and invoices. The address and tax id are required for compliant invoice records. |
-| `User` | `passwordHash`, `passwordVersion` | Authentication. Never the plaintext password. |
-| `User` | `logoUrl`, `signatureUrl` | Brand mark and typed signature for proposals. |
-| `Client` | `name`, `companyName`, `email`, `phone`, `address`, `taxId` | Recipient details for proposals, invoices, portal magic links. |
-| `Proposal` | `acceptedByName`, `acceptedByEmail`, `acceptedByIp` | Captured at the moment of acceptance to make the agreement evidentiary. |
-| `Invoice` | (no separate PII columns; the bill-to copy is denormalized from `Client` fields when issued so the invoice is self-consistent if the client record changes later) | Audit trail and historical accuracy. |
-| `ClientPortalSession` | `clientId`, `ip`, `userAgent` | Magic-link binding and audit on redemption. |
-| `AuditLog` | `userId`, `ip`, `userAgent`, `metadata` | Provenance and incident response. |
+| Entity                | Field                                                                                                                                                             | Why stored                                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `User`                | `email`                                                                                                                                                           | Account identifier and Reply-To on outbound mail.                                                      |
+| `User`                | `name`, `businessName`, `businessAddress`, `businessTaxId`                                                                                                        | Rendered on proposals and invoices. The address and tax id are required for compliant invoice records. |
+| `User`                | `passwordHash`, `passwordVersion`                                                                                                                                 | Authentication. Never the plaintext password.                                                          |
+| `User`                | `logoUrl`, `signatureUrl`                                                                                                                                         | Brand mark and typed signature for proposals.                                                          |
+| `Client`              | `name`, `companyName`, `email`, `phone`, `address`, `taxId`                                                                                                       | Recipient details for proposals, invoices, portal magic links.                                         |
+| `Proposal`            | `acceptedByName`, `acceptedByEmail`, `acceptedByIp`                                                                                                               | Captured at the moment of acceptance to make the agreement evidentiary.                                |
+| `Invoice`             | (no separate PII columns; the bill-to copy is denormalized from `Client` fields when issued so the invoice is self-consistent if the client record changes later) | Audit trail and historical accuracy.                                                                   |
+| `ClientPortalSession` | `clientId`, `ip`, `userAgent`                                                                                                                                     | Magic-link binding and audit on redemption.                                                            |
+| `AuditLog`            | `userId`, `ip`, `userAgent`, `metadata`                                                                                                                           | Provenance and incident response.                                                                      |
 
-Two values that look like they should be in the inventory and are *not*:
+Two values that look like they should be in the inventory and are _not_:
 
 - **Plaintext passwords.** Never stored. Bcrypt hash is the only persistence.
 - **Plaintext magic-link tokens.** Never stored. Sha256 hash on `ClientPortalSession.tokenHash`.
@@ -75,13 +75,14 @@ Two paths.
 
 The download URL is valid for 24 hours and is single-use; after redemption, the bundle is deleted from UploadThing.
 
-**Pre-deletion bundle.** Triggered automatically when the user requests account deletion. The bundle is the same shape as above. The link arrives by email *immediately* on deletion request (not at the 30-day mark); the user has access to their data even during the grace period.
+**Pre-deletion bundle.** Triggered automatically when the user requests account deletion. The bundle is the same shape as above. The link arrives by email _immediately_ on deletion request (not at the 30-day mark); the user has access to their data even during the grace period.
 
 ## Logging hygiene
 
 The `logger` in `src/lib/log.ts` and the Sentry integration both follow a strict hygiene rule.
 
 **Never log:**
+
 - Plaintext passwords.
 - Plaintext tokens (magic-link tokens, JWT bodies, public-link tokens). The hash or a redacted "[token]" string is acceptable; the value is not.
 - Full email body content. The recipient address may be logged for delivery failures; the body is not.
@@ -89,6 +90,7 @@ The `logger` in `src/lib/log.ts` and the Sentry integration both follow a strict
 - The `User.passwordHash` even when reading the row in development.
 
 **Acceptable to log:**
+
 - IP and user agent in audit metadata, with retention per the table below.
 - User ids (cuid). They are not PII in themselves; they are application identifiers.
 - Email addresses in audit and rate-limit metadata. They are PII but they are necessary for incident response and abuse mitigation.
@@ -98,19 +100,19 @@ The Sentry SDK is configured to scrub fields named `password`, `token`, `secret`
 
 ```typescript
 // src/lib/sentry.ts (excerpt)
-import * as Sentry from "@sentry/nextjs";
-import { env } from "@/lib/env";
+import * as Sentry from '@sentry/nextjs';
+import { env } from '@/lib/env';
 
 Sentry.init({
   dsn: env.SENTRY_DSN,
   environment: env.NODE_ENV,
   beforeSend(event) {
-    const scrubs = ["password", "token", "secret", "authorization", "cookie", "passwordHash"];
+    const scrubs = ['password', 'token', 'secret', 'authorization', 'cookie', 'passwordHash'];
     if (event.request?.cookies) delete event.request.cookies;
     if (event.request?.headers) {
       for (const k of Object.keys(event.request.headers)) {
         if (scrubs.some((s) => k.toLowerCase().includes(s))) {
-          event.request.headers[k] = "[scrubbed]";
+          event.request.headers[k] = '[scrubbed]';
         }
       }
     }
@@ -121,17 +123,17 @@ Sentry.init({
 
 ## Retention
 
-| Data | Retention |
-|---|---|
-| `AuditLog` (full detail) | 90 days |
-| `AuditLog` (compacted summary) | After 90 days, daily summaries; see `docs/architecture/audit-log.md` |
-| `ClientPortalSession` (consumed) | Until `sessionExpiresAt`, then deleted by daily cleanup cron |
-| `ClientPortalSession` (unconsumed expired) | Deleted by the same cron 24 hours after `magicLinkExpiresAt` |
-| Soft-deleted `User` | 30 days after `deletedAt`, then hard-deleted by `users.purge-deleted` cron |
-| Soft-deleted `FileUpload` | 30 days after `deletionPendingAt`, then hard-deleted (see `docs/architecture/file-uploads.md`) |
-| `DeletedUserLog` (anonymized) | Indefinite (no PII) |
-| Outbound email metadata in Resend | Resend's default retention (their dashboard) |
-| Sentry events | Sentry's default retention by plan tier |
+| Data                                       | Retention                                                                                      |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `AuditLog` (full detail)                   | 90 days                                                                                        |
+| `AuditLog` (compacted summary)             | After 90 days, daily summaries; see `docs/architecture/audit-log.md`                           |
+| `ClientPortalSession` (consumed)           | Until `sessionExpiresAt`, then deleted by daily cleanup cron                                   |
+| `ClientPortalSession` (unconsumed expired) | Deleted by the same cron 24 hours after `magicLinkExpiresAt`                                   |
+| Soft-deleted `User`                        | 30 days after `deletedAt`, then hard-deleted by `users.purge-deleted` cron                     |
+| Soft-deleted `FileUpload`                  | 30 days after `deletionPendingAt`, then hard-deleted (see `docs/architecture/file-uploads.md`) |
+| `DeletedUserLog` (anonymized)              | Indefinite (no PII)                                                                            |
+| Outbound email metadata in Resend          | Resend's default retention (their dashboard)                                                   |
+| Sentry events                              | Sentry's default retention by plan tier                                                        |
 
 Retention is enforced by daily Inngest cron functions. Each cron writes audit `cron.<name>.run` with a count of rows processed.
 

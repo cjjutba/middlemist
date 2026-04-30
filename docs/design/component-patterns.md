@@ -23,10 +23,12 @@ The signature pill-in-pill component. A rounded pill container that holds 2-5 it
 - Active item (`{component.category-tab-active}`): `background: {colors.canvas}`, `color: {colors.ink}`, subtle `box-shadow: 0 1px 2px rgba(0,0,0,0.05)`
 
 ```tsx
-<div className="inline-flex p-1 bg-surface-soft rounded-pill">
-  <button className="px-4 py-2 text-nav-link text-muted rounded-pill">All</button>
-  <button className="px-4 py-2 text-nav-link text-ink bg-canvas rounded-pill shadow-sm">Active</button>
-  <button className="px-4 py-2 text-nav-link text-muted rounded-pill">Archived</button>
+<div className="bg-surface-soft rounded-pill inline-flex p-1">
+  <button className="text-nav-link text-muted rounded-pill px-4 py-2">All</button>
+  <button className="text-nav-link text-ink bg-canvas rounded-pill px-4 py-2 shadow-sm">
+    Active
+  </button>
+  <button className="text-nav-link text-muted rounded-pill px-4 py-2">Archived</button>
 </div>
 ```
 
@@ -61,16 +63,16 @@ The Cmd+K overlay. A modal that opens centered at the top third of the viewport,
 
 ```tsx
 <div className="fixed inset-0 bg-black/40">
-  <div className="mx-auto mt-[20vh] w-full max-w-[600px] bg-canvas rounded-lg shadow-2xl">
+  <div className="bg-canvas mx-auto mt-[20vh] w-full max-w-[600px] rounded-lg shadow-2xl">
     <input
-      className="w-full px-5 py-4 text-body-md border-b border-hairline focus:outline-none"
+      className="text-body-md border-hairline w-full border-b px-5 py-4 focus:outline-none"
       placeholder="Search clients, projects, proposals..."
     />
     <div>
-      <div className="px-4 py-2 text-caption text-muted uppercase">Clients</div>
-      <button className="flex w-full items-center justify-between px-4 py-2.5 text-body-sm text-body bg-surface-card text-ink">
+      <div className="text-caption text-muted px-4 py-2 uppercase">Clients</div>
+      <button className="text-body-sm text-body bg-surface-card text-ink flex w-full items-center justify-between px-4 py-2.5">
         <span>Mangosteen Studio</span>
-        <kbd className="text-xs text-muted-soft">⏎</kbd>
+        <kbd className="text-muted-soft text-xs">⏎</kbd>
       </button>
     </div>
   </div>
@@ -89,7 +91,7 @@ The primary action button. Near-black `{colors.primary}` background, white text,
 - Sizes: sm (8 × 14, 12px font), md (12 × 20, 14px font, default), lg (14 × 24, 16px font)
 
 ```tsx
-<button className="px-5 py-3 bg-primary text-on-primary text-button rounded-md transition-colors duration-150 active:bg-primary-active disabled:opacity-50">
+<button className="bg-primary text-on-primary text-button active:bg-primary-active rounded-md px-5 py-3 transition-colors duration-150 disabled:opacity-50">
   Send proposal
 </button>
 ```
@@ -136,7 +138,7 @@ The default text input. Hairline border, white background, 8px radius. Asymmetri
 ```tsx
 <input
   type="text"
-  className="w-full px-3.5 py-2.5 bg-canvas border border-hairline rounded-md text-body-md placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/10 focus:outline-none"
+  className="bg-canvas border-hairline text-body-md placeholder:text-muted focus:border-primary focus:ring-primary/10 w-full rounded-md border px-3.5 py-2.5 focus:ring-2 focus:outline-none"
   placeholder="Client name"
 />
 ```
@@ -179,9 +181,9 @@ The light-gray card. Used for abstract feature claims, testimonial quotes, value
 - No border. The light-gray surface against white canvas provides the boundary.
 
 ```tsx
-<div className="p-8 bg-surface-card rounded-lg">
+<div className="bg-surface-card rounded-lg p-8">
   <h3 className="text-title-md text-ink">Proposals that read like documents</h3>
-  <p className="mt-2 text-body-md text-body">
+  <p className="text-body-md text-body mt-2">
     Block-based editor with saved templates and per-client branding.
   </p>
 </div>
@@ -328,7 +330,7 @@ A semantic-colored pill for entity statuses (proposal: draft/sent/accepted/decli
   - **Error** (void, declined): `background: {colors.error}/10`, `color: {colors.error}`
 
 ```tsx
-<span className="inline-flex items-center px-2.5 py-1 rounded-pill text-caption font-medium bg-success/10 text-success">
+<span className="rounded-pill text-caption bg-success/10 text-success inline-flex items-center px-2.5 py-1 font-medium">
   Paid
 </span>
 ```
@@ -452,13 +454,13 @@ The dark footer that closes every page. Only one per page.
 - Copyright in `{colors.on-dark-soft}` `{typography.caption}`
 
 ```tsx
-<footer className="bg-surface-dark text-on-dark py-12 px-6">
-  <div className="mx-auto max-w-[1200px] flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-    <div className="flex items-center gap-2 font-display text-title-md">
-      <span className="size-3 rounded-full bg-on-dark" />
+<footer className="bg-surface-dark text-on-dark px-6 py-12">
+  <div className="mx-auto flex max-w-[1200px] flex-col gap-6 md:flex-row md:items-center md:justify-between">
+    <div className="font-display text-title-md flex items-center gap-2">
+      <span className="bg-on-dark size-3 rounded-full" />
       middlemist
     </div>
-    <nav className="flex gap-6 text-body-sm text-on-dark-soft">
+    <nav className="text-body-sm text-on-dark-soft flex gap-6">
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="/contact">Contact</a>

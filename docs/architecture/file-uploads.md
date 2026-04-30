@@ -8,13 +8,13 @@ The decision to use UploadThing over raw S3/R2 is captured in `tech-stack.md`. T
 
 Each upload context has its own handler with its own constraints. There is no generic "upload anything" route.
 
-| Context | Max size | Allowed MIME types |
-|---|---|---|
-| Profile photo | 2 MB | `image/png`, `image/jpeg`, `image/webp` |
-| Business logo | 2 MB | `image/png`, `image/jpeg`, `image/svg+xml` |
-| Proposal image block | 5 MB | `image/png`, `image/jpeg`, `image/webp`, `image/gif` |
-| Update attachment | 10 MB | `image/*`, `application/pdf` |
-| Invoice attachment | 5 MB | `application/pdf` |
+| Context              | Max size | Allowed MIME types                                   |
+| -------------------- | -------- | ---------------------------------------------------- |
+| Profile photo        | 2 MB     | `image/png`, `image/jpeg`, `image/webp`              |
+| Business logo        | 2 MB     | `image/png`, `image/jpeg`, `image/svg+xml`           |
+| Proposal image block | 5 MB     | `image/png`, `image/jpeg`, `image/webp`, `image/gif` |
+| Update attachment    | 10 MB    | `image/*`, `application/pdf`                         |
+| Invoice attachment   | 5 MB     | `application/pdf`                                    |
 
 `image/svg+xml` is allowed only for the business logo because it is the format CJ wants to use for vector marks. The renderer that displays SVG sanitizes it (DOMPurify with strict config) to remove any embedded `<script>` or `onclick` handlers. Other contexts reject SVG.
 
@@ -26,16 +26,16 @@ Every upload route requires an authenticated session. The UploadThing `f.middlew
 
 ```typescript
 // src/app/api/uploadthing/core.ts
-import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { auth } from "@/lib/auth/config";
+import { createUploadthing, type FileRouter } from 'uploadthing/next';
+import { auth } from '@/lib/auth/config';
 
 const f = createUploadthing();
 
 export const uploadRouter = {
-  profilePhoto: f({ image: { maxFileSize: "2MB" } })
+  profilePhoto: f({ image: { maxFileSize: '2MB' } })
     .middleware(async () => {
       const session = await auth();
-      if (!session?.user?.id) throw new Error("UNAUTHENTICATED");
+      if (!session?.user?.id) throw new Error('UNAUTHENTICATED');
       return { userId: session.user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {

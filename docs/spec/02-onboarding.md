@@ -77,10 +77,10 @@ States:
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `updateBusinessProfile` | Subset of `User` (businessName, logoUrl, defaultCurrency, etc.) | `{ ok: true, data: User }` | Updates `User`. |
-| `completeOnboarding` | `{}` | `{ ok: true }` | Sets `User.onboardingDoneAt = now`; writes audit `user.onboarding-completed`. |
+| Action                  | Input                                                           | Output                     | Side effects                                                                  |
+| ----------------------- | --------------------------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------- |
+| `updateBusinessProfile` | Subset of `User` (businessName, logoUrl, defaultCurrency, etc.) | `{ ok: true, data: User }` | Updates `User`.                                                               |
+| `completeOnboarding`    | `{}`                                                            | `{ ok: true }`             | Sets `User.onboardingDoneAt = now`; writes audit `user.onboarding-completed`. |
 
 `createClient` (from the Clients module) is reused for step 4 rather than introducing an onboarding-specific create.
 

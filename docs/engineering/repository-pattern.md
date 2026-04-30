@@ -50,8 +50,8 @@ Every public repository function:
 
 ```typescript
 // src/lib/repositories/clients.repo.ts
-import { prisma } from "@/lib/prisma";
-import type { Client, Currency } from "@prisma/client";
+import { prisma } from '@/lib/prisma';
+import type { Client, Currency } from '@prisma/client';
 
 export const clientsRepo = {
   async findById(userId: string, id: string): Promise<Client | null> {
@@ -62,7 +62,7 @@ export const clientsRepo = {
 
   async list(
     userId: string,
-    filters: { search?: string; includeArchived?: boolean } = {}
+    filters: { search?: string; includeArchived?: boolean } = {},
   ): Promise<Client[]> {
     return prisma.client.findMany({
       where: {
@@ -71,14 +71,14 @@ export const clientsRepo = {
         ...(filters.search
           ? {
               OR: [
-                { name: { contains: filters.search, mode: "insensitive" } },
-                { companyName: { contains: filters.search, mode: "insensitive" } },
-                { email: { contains: filters.search, mode: "insensitive" } },
+                { name: { contains: filters.search, mode: 'insensitive' } },
+                { companyName: { contains: filters.search, mode: 'insensitive' } },
+                { email: { contains: filters.search, mode: 'insensitive' } },
               ],
             }
           : {}),
       },
-      orderBy: { name: "asc" },
+      orderBy: { name: 'asc' },
     });
   },
 
@@ -94,7 +94,7 @@ export const clientsRepo = {
       taxId?: string | null;
       notes?: string | null;
       preferredCurrency?: Currency | null;
-    }
+    },
   ): Promise<Client> {
     return prisma.client.create({
       data: { ...input, userId },
@@ -114,15 +114,15 @@ export const clientsRepo = {
       taxId: string | null;
       notes: string | null;
       preferredCurrency: Currency | null;
-    }>
+    }>,
   ): Promise<Client> {
     const result = await prisma.client.updateMany({
       where: { id, userId },
       data: input,
     });
-    if (result.count === 0) throw new Error("CLIENT_NOT_FOUND");
+    if (result.count === 0) throw new Error('CLIENT_NOT_FOUND');
     const updated = await clientsRepo.findById(userId, id);
-    if (!updated) throw new Error("CLIENT_NOT_FOUND");
+    if (!updated) throw new Error('CLIENT_NOT_FOUND');
     return updated;
   },
 
@@ -131,7 +131,7 @@ export const clientsRepo = {
       where: { id, userId, archivedAt: null },
       data: { archivedAt: new Date() },
     });
-    if (result.count === 0) throw new Error("CLIENT_NOT_FOUND");
+    if (result.count === 0) throw new Error('CLIENT_NOT_FOUND');
   },
 };
 ```
@@ -146,15 +146,15 @@ Two patterns to recognize.
 
 Conventional verbs across every repo:
 
-| Method | Behavior |
-|---|---|
-| `findById(userId, id)` | Returns the row or `null`. Filters by `archivedAt: null` unless the entity has no soft-delete. |
-| `findMany(userId, filters)` / `list(userId, filters)` | Returns an array. Sorted by a sensible default. |
-| `create(userId, input)` | Inserts a row with `userId` baked in. |
-| `update(userId, id, input)` | Updates fields. Throws `<ENTITY>_NOT_FOUND` for cross-tenant or missing rows. |
-| `archive(userId, id)` | Sets `archivedAt = now`. |
-| `unarchive(userId, id)` | Clears `archivedAt`. |
-| `softDelete(userId, id)` | Sets `deletedAt = now` (used for entities with explicit deletion lifecycle, e.g., files). |
+| Method                                                | Behavior                                                                                       |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `findById(userId, id)`                                | Returns the row or `null`. Filters by `archivedAt: null` unless the entity has no soft-delete. |
+| `findMany(userId, filters)` / `list(userId, filters)` | Returns an array. Sorted by a sensible default.                                                |
+| `create(userId, input)`                               | Inserts a row with `userId` baked in.                                                          |
+| `update(userId, id, input)`                           | Updates fields. Throws `<ENTITY>_NOT_FOUND` for cross-tenant or missing rows.                  |
+| `archive(userId, id)`                                 | Sets `archivedAt = now`.                                                                       |
+| `unarchive(userId, id)`                               | Clears `archivedAt`.                                                                           |
+| `softDelete(userId, id)`                              | Sets `deletedAt = now` (used for entities with explicit deletion lifecycle, e.g., files).      |
 
 Cross-cutting helpers (search, count, exists) follow the same `userId`-first convention and are named for what they return:
 
@@ -195,38 +195,38 @@ The cast at the boundary acknowledges the discrepancy between Prisma's inferred 
 
 ```typescript
 // src/lib/services/proposals.service.ts
-import { proposalsRepo } from "@/lib/repositories/proposals.repo";
-import { clientsRepo } from "@/lib/repositories/clients.repo";
-import { writeAudit } from "@/lib/audit/write";
-import { inngest } from "@/lib/inngest/client";
-import { NotFoundError, ValidationError } from "@/lib/utils/errors";
+import { proposalsRepo } from '@/lib/repositories/proposals.repo';
+import { clientsRepo } from '@/lib/repositories/clients.repo';
+import { writeAudit } from '@/lib/audit/write';
+import { inngest } from '@/lib/inngest/client';
+import { NotFoundError, ValidationError } from '@/lib/utils/errors';
 
 export const proposalsService = {
   async send(userId: string, proposalId: string) {
     const proposal = await proposalsRepo.findById(userId, proposalId);
-    if (!proposal) throw new NotFoundError("Proposal not found");
-    if (proposal.status !== "draft") {
-      throw new ValidationError("Only draft proposals can be sent");
+    if (!proposal) throw new NotFoundError('Proposal not found');
+    if (proposal.status !== 'draft') {
+      throw new ValidationError('Only draft proposals can be sent');
     }
     const client = await clientsRepo.findById(userId, proposal.clientId);
-    if (!client) throw new NotFoundError("Client not found");
-    if (!client.emailValid) throw new ValidationError("Client email has bounced");
+    if (!client) throw new NotFoundError('Client not found');
+    if (!client.emailValid) throw new ValidationError('Client email has bounced');
 
     const updated = await proposalsRepo.update(userId, proposalId, {
-      status: "sent",
+      status: 'sent',
       sentAt: new Date(),
     });
 
     await writeAudit({
       userId,
-      action: "proposal.sent",
-      entityType: "proposal",
+      action: 'proposal.sent',
+      entityType: 'proposal',
       entityId: proposalId,
-      metadata: { from: "draft", to: "sent" },
+      metadata: { from: 'draft', to: 'sent' },
     });
 
     await inngest.send({
-      name: "proposal.sent",
+      name: 'proposal.sent',
       data: { userId, proposalId },
     });
 
@@ -245,7 +245,7 @@ If v2 introduces cross-tenant operations (e.g., an admin dashboard for the opera
 
 ## Public-token repos
 
-The repository function for public lookups does not take `userId`. The token *is* the access proof. The lookup happens by token; the row that matches is the entire authorization scope.
+The repository function for public lookups does not take `userId`. The token _is_ the access proof. The lookup happens by token; the row that matches is the entire authorization scope.
 
 ```typescript
 // src/lib/repositories/proposals.repo.ts (excerpt)
@@ -286,22 +286,24 @@ Every repository function gets a two-user isolation test. The test seeds rows fo
 
 ```typescript
 // src/lib/repositories/__tests__/clients.repo.test.ts
-import { describe, it, expect, beforeEach } from "vitest";
-import { prisma } from "@/lib/prisma";
-import { clientsRepo } from "../clients.repo";
+import { describe, it, expect, beforeEach } from 'vitest';
+import { prisma } from '@/lib/prisma';
+import { clientsRepo } from '../clients.repo';
 
-describe("clientsRepo (multi-tenant isolation)", () => {
+describe('clientsRepo (multi-tenant isolation)', () => {
   let userA: string;
   let userB: string;
 
   beforeEach(async () => {
     await prisma.client.deleteMany();
     await prisma.user.deleteMany();
-    userA = (await prisma.user.create({ data: { email: "a@test", name: "A", passwordHash: "x" } })).id;
-    userB = (await prisma.user.create({ data: { email: "b@test", name: "B", passwordHash: "x" } })).id;
+    userA = (await prisma.user.create({ data: { email: 'a@test', name: 'A', passwordHash: 'x' } }))
+      .id;
+    userB = (await prisma.user.create({ data: { email: 'b@test', name: 'B', passwordHash: 'x' } }))
+      .id;
 
-    await prisma.client.create({ data: { userId: userA, name: "Acme", email: "acme@a.test" } });
-    await prisma.client.create({ data: { userId: userB, name: "Acme", email: "acme@b.test" } });
+    await prisma.client.create({ data: { userId: userA, name: 'Acme', email: 'acme@a.test' } });
+    await prisma.client.create({ data: { userId: userB, name: 'Acme', email: 'acme@b.test' } });
   });
 
   it("list returns only the calling user's clients", async () => {
@@ -309,27 +311,27 @@ describe("clientsRepo (multi-tenant isolation)", () => {
     const bClients = await clientsRepo.list(userB);
     expect(aClients).toHaveLength(1);
     expect(bClients).toHaveLength(1);
-    expect(aClients[0].email).toBe("acme@a.test");
-    expect(bClients[0].email).toBe("acme@b.test");
+    expect(aClients[0].email).toBe('acme@a.test');
+    expect(bClients[0].email).toBe('acme@b.test');
   });
 
-  it("findById returns null for cross-tenant access", async () => {
+  it('findById returns null for cross-tenant access', async () => {
     const bClient = (await prisma.client.findFirst({ where: { userId: userB } }))!;
     const result = await clientsRepo.findById(userA, bClient.id);
     expect(result).toBeNull();
   });
 
-  it("update is a no-op for cross-tenant access", async () => {
+  it('update is a no-op for cross-tenant access', async () => {
     const bClient = (await prisma.client.findFirst({ where: { userId: userB } }))!;
-    await expect(
-      clientsRepo.update(userA, bClient.id, { name: "Changed" })
-    ).rejects.toThrow("CLIENT_NOT_FOUND");
+    await expect(clientsRepo.update(userA, bClient.id, { name: 'Changed' })).rejects.toThrow(
+      'CLIENT_NOT_FOUND',
+    );
     const reread = (await prisma.client.findUnique({ where: { id: bClient.id } }))!;
-    expect(reread.name).toBe("Acme");
+    expect(reread.name).toBe('Acme');
   });
 });
 ```
 
 The test runs against a real Postgres (Neon test branch in CI, Docker locally). Mocked Prisma cannot prove tenancy; the test must hit the database. See `docs/engineering/testing.md` for the test infrastructure.
 
-A new repo without an isolation test does not pass review. The pattern is mechanical enough that the cost of writing the test is low; the cost of *not* writing it is the chance of a tenancy leak.
+A new repo without an isolation test does not pass review. The pattern is mechanical enough that the cost of writing the test is low; the cost of _not_ writing it is the chance of a tenancy leak.

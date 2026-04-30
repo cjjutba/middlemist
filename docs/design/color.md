@@ -10,65 +10,65 @@ Every color in the product is one of these tokens. Inline hex values in code are
 
 ### Brand and accent
 
-| Token | Value | Use |
-|---|---|---|
-| `{colors.primary}` | `#111111` | Primary CTAs, h1 and h2 display type, anchor ink |
-| `{colors.primary-active}` | `#242424` | Primary press state |
-| `{colors.brand-accent}` | `#3b82f6` | Inline body links, occasional badge highlight |
-| `{colors.badge-orange}` | `#fb923c` | Avatar fills, tag pills |
-| `{colors.badge-pink}` | `#ec4899` | Avatar fills, tag pills |
-| `{colors.badge-violet}` | `#8b5cf6` | Avatar fills, tag pills |
-| `{colors.badge-emerald}` | `#34d399` | Avatar fills, tag pills |
+| Token                     | Value     | Use                                              |
+| ------------------------- | --------- | ------------------------------------------------ |
+| `{colors.primary}`        | `#111111` | Primary CTAs, h1 and h2 display type, anchor ink |
+| `{colors.primary-active}` | `#242424` | Primary press state                              |
+| `{colors.brand-accent}`   | `#3b82f6` | Inline body links, occasional badge highlight    |
+| `{colors.badge-orange}`   | `#fb923c` | Avatar fills, tag pills                          |
+| `{colors.badge-pink}`     | `#ec4899` | Avatar fills, tag pills                          |
+| `{colors.badge-violet}`   | `#8b5cf6` | Avatar fills, tag pills                          |
+| `{colors.badge-emerald}`  | `#34d399` | Avatar fills, tag pills                          |
 
 ### Surface
 
-| Token | Value | Use |
-|---|---|---|
-| `{colors.canvas}` | `#ffffff` | Page background, product mockup card |
-| `{colors.surface-soft}` | `#f8f9fa` | Nav-pill-group container, soft dividers |
-| `{colors.surface-card}` | `#f5f5f5` | Feature cards, testimonial cards |
-| `{colors.surface-strong}` | `#e5e7eb` | Strong dividers, occasional input borders |
-| `{colors.surface-dark}` | `#101010` | Footer, featured pricing tier |
-| `{colors.surface-dark-elevated}` | `#1a1a1a` | Cards on dark surfaces, tooltip body |
-| `{colors.hairline}` | `#e5e7eb` | Card borders, input borders, table dividers |
-| `{colors.hairline-soft}` | `#f3f4f6` | Soft dividers within cards |
+| Token                            | Value     | Use                                         |
+| -------------------------------- | --------- | ------------------------------------------- |
+| `{colors.canvas}`                | `#ffffff` | Page background, product mockup card        |
+| `{colors.surface-soft}`          | `#f8f9fa` | Nav-pill-group container, soft dividers     |
+| `{colors.surface-card}`          | `#f5f5f5` | Feature cards, testimonial cards            |
+| `{colors.surface-strong}`        | `#e5e7eb` | Strong dividers, occasional input borders   |
+| `{colors.surface-dark}`          | `#101010` | Footer, featured pricing tier               |
+| `{colors.surface-dark-elevated}` | `#1a1a1a` | Cards on dark surfaces, tooltip body        |
+| `{colors.hairline}`              | `#e5e7eb` | Card borders, input borders, table dividers |
+| `{colors.hairline-soft}`         | `#f3f4f6` | Soft dividers within cards                  |
 
 ### Text
 
-| Token | Value | Use |
-|---|---|---|
-| `{colors.ink}` | `#111111` | h1, h2, primary text on light surfaces |
-| `{colors.body}` | `#374151` | Body text, default running text |
-| `{colors.muted}` | `#6b7280` | Secondary text, captions, metadata |
-| `{colors.muted-soft}` | `#898989` | Tertiary text, fine-print, disabled labels |
-| `{colors.on-primary}` | `#ffffff` | Text on `{colors.primary}` (button labels) |
-| `{colors.on-dark}` | `#ffffff` | Text on `{colors.surface-dark}` |
-| `{colors.on-dark-soft}` | `#a1a1aa` | Secondary text on dark surfaces |
+| Token                   | Value     | Use                                        |
+| ----------------------- | --------- | ------------------------------------------ |
+| `{colors.ink}`          | `#111111` | h1, h2, primary text on light surfaces     |
+| `{colors.body}`         | `#374151` | Body text, default running text            |
+| `{colors.muted}`        | `#6b7280` | Secondary text, captions, metadata         |
+| `{colors.muted-soft}`   | `#898989` | Tertiary text, fine-print, disabled labels |
+| `{colors.on-primary}`   | `#ffffff` | Text on `{colors.primary}` (button labels) |
+| `{colors.on-dark}`      | `#ffffff` | Text on `{colors.surface-dark}`            |
+| `{colors.on-dark-soft}` | `#a1a1aa` | Secondary text on dark surfaces            |
 
 ### Semantic
 
-| Token | Value | Use |
-|---|---|---|
-| `{colors.success}` | `#10b981` | Success states, paid invoices, accepted proposals |
+| Token              | Value     | Use                                                  |
+| ------------------ | --------- | ---------------------------------------------------- |
+| `{colors.success}` | `#10b981` | Success states, paid invoices, accepted proposals    |
 | `{colors.warning}` | `#f59e0b` | Warning states, overdue invoices, expiring proposals |
-| `{colors.error}` | `#ef4444` | Error states, destructive actions, validation errors |
+| `{colors.error}`   | `#ef4444` | Error states, destructive actions, validation errors |
 
 ## Semantic layer
 
 On top of the raw tokens, a thin semantic layer defines the most common patterns. The semantic tokens map to the raw tokens; components reference the semantic tokens so that a change at the raw layer (if one ever happens) propagates.
 
-| Semantic token | Maps to | Use |
-|---|---|---|
-| `--surface-bg` | `{colors.canvas}` | Page background |
-| `--surface-card` | `{colors.surface-card}` | Card surface |
-| `--surface-soft` | `{colors.surface-soft}` | Nav-pill-group, soft dividers |
-| `--border-subtle` | `{colors.hairline}` | Default border |
-| `--border-strong` | `{colors.surface-strong}` | Strong border |
-| `--text-primary` | `{colors.ink}` | Primary text |
-| `--text-secondary` | `{colors.body}` | Body text |
-| `--text-tertiary` | `{colors.muted}` | Secondary text |
-| `--text-faint` | `{colors.muted-soft}` | Tertiary text |
-| `--brand-accent` | `{colors.brand-accent}` | Inline link, rare badge highlight |
+| Semantic token     | Maps to                   | Use                               |
+| ------------------ | ------------------------- | --------------------------------- |
+| `--surface-bg`     | `{colors.canvas}`         | Page background                   |
+| `--surface-card`   | `{colors.surface-card}`   | Card surface                      |
+| `--surface-soft`   | `{colors.surface-soft}`   | Nav-pill-group, soft dividers     |
+| `--border-subtle`  | `{colors.hairline}`       | Default border                    |
+| `--border-strong`  | `{colors.surface-strong}` | Strong border                     |
+| `--text-primary`   | `{colors.ink}`            | Primary text                      |
+| `--text-secondary` | `{colors.body}`           | Body text                         |
+| `--text-tertiary`  | `{colors.muted}`          | Secondary text                    |
+| `--text-faint`     | `{colors.muted-soft}`     | Tertiary text                     |
+| `--brand-accent`   | `{colors.brand-accent}`   | Inline link, rare badge highlight |
 
 ```css
 /* src/styles/tokens.css (excerpt) */
@@ -163,22 +163,22 @@ The five rules below cover where each color lives. The anti-patterns doc covers 
 
 WCAG AA requires 4.5:1 contrast for body text and 3:1 for large text (24px+). Every text/background pair in the system has been verified.
 
-| Pair | Ratio | WCAG |
-|---|---|---|
-| `{colors.ink}` `#111111` on `{colors.canvas}` `#ffffff` | 19.07:1 | AAA |
-| `{colors.body}` `#374151` on `{colors.canvas}` `#ffffff` | 9.49:1 | AAA |
-| `{colors.muted}` `#6b7280` on `{colors.canvas}` `#ffffff` | 4.83:1 | AA |
-| `{colors.muted-soft}` `#898989` on `{colors.canvas}` `#ffffff` | 3.43:1 | Large text only |
-| `{colors.ink}` `#111111` on `{colors.surface-card}` `#f5f5f5` | 17.27:1 | AAA |
-| `{colors.body}` `#374151` on `{colors.surface-card}` `#f5f5f5` | 8.59:1 | AAA |
-| `{colors.muted}` `#6b7280` on `{colors.surface-card}` `#f5f5f5` | 4.37:1 | AA Large |
-| `{colors.on-dark}` `#ffffff` on `{colors.surface-dark}` `#101010` | 19.69:1 | AAA |
-| `{colors.on-dark-soft}` `#a1a1aa` on `{colors.surface-dark}` `#101010` | 9.04:1 | AAA |
-| `{colors.on-primary}` `#ffffff` on `{colors.primary}` `#111111` | 19.07:1 | AAA |
-| `{colors.brand-accent}` `#3b82f6` on `{colors.canvas}` `#ffffff` | 4.51:1 | AA |
-| `{colors.success}` `#10b981` on `{colors.canvas}` `#ffffff` | 2.78:1 | UI element only, not text |
-| `{colors.warning}` `#f59e0b` on `{colors.canvas}` `#ffffff` | 2.34:1 | UI element only, not text |
-| `{colors.error}` `#ef4444` on `{colors.canvas}` `#ffffff` | 3.76:1 | Large text + UI |
+| Pair                                                                   | Ratio   | WCAG                      |
+| ---------------------------------------------------------------------- | ------- | ------------------------- |
+| `{colors.ink}` `#111111` on `{colors.canvas}` `#ffffff`                | 19.07:1 | AAA                       |
+| `{colors.body}` `#374151` on `{colors.canvas}` `#ffffff`               | 9.49:1  | AAA                       |
+| `{colors.muted}` `#6b7280` on `{colors.canvas}` `#ffffff`              | 4.83:1  | AA                        |
+| `{colors.muted-soft}` `#898989` on `{colors.canvas}` `#ffffff`         | 3.43:1  | Large text only           |
+| `{colors.ink}` `#111111` on `{colors.surface-card}` `#f5f5f5`          | 17.27:1 | AAA                       |
+| `{colors.body}` `#374151` on `{colors.surface-card}` `#f5f5f5`         | 8.59:1  | AAA                       |
+| `{colors.muted}` `#6b7280` on `{colors.surface-card}` `#f5f5f5`        | 4.37:1  | AA Large                  |
+| `{colors.on-dark}` `#ffffff` on `{colors.surface-dark}` `#101010`      | 19.69:1 | AAA                       |
+| `{colors.on-dark-soft}` `#a1a1aa` on `{colors.surface-dark}` `#101010` | 9.04:1  | AAA                       |
+| `{colors.on-primary}` `#ffffff` on `{colors.primary}` `#111111`        | 19.07:1 | AAA                       |
+| `{colors.brand-accent}` `#3b82f6` on `{colors.canvas}` `#ffffff`       | 4.51:1  | AA                        |
+| `{colors.success}` `#10b981` on `{colors.canvas}` `#ffffff`            | 2.78:1  | UI element only, not text |
+| `{colors.warning}` `#f59e0b` on `{colors.canvas}` `#ffffff`            | 2.34:1  | UI element only, not text |
+| `{colors.error}` `#ef4444` on `{colors.canvas}` `#ffffff`              | 3.76:1  | Large text + UI           |
 
 The `muted-soft` token is restricted to large text or non-text UI accents. Semantic colors (`success`, `warning`, `error`) below 4.5:1 are paired with text on a status pill that uses dark ink on a tinted background, not white text on the semantic color directly. The `{component.status-pill}` component encodes this rule.
 

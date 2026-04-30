@@ -101,14 +101,14 @@ Modal-as-route same pattern as Clients. Same form as the inline create modal.
 
 ## Server Actions
 
-| Action | Input | Output | Side effects |
-|---|---|---|---|
-| `createProject` | `createProjectSchema` | `{ ok: true, data: { id } }` | Generates `publicToken`; inserts; writes `project.created` audit. |
-| `updateProject` | `updateProjectSchema` (id + partials) | `{ ok: true, data: Project }` | Updates fields. Currency, status, archive state are not editable via this action. |
-| `setProjectStatus` | `{ id, status }` | `{ ok: true, data: Project }` | Validates transition. Writes `project.status-changed` audit with `{ from, to }`. Sets `endedAt = now` when transitioning to `completed`. |
-| `archiveProject` | `{ id }` | `{ ok: true }` | Sets `archivedAt = now`, `status = archived`. Writes audit. |
-| `unarchiveProject` | `{ id }` | `{ ok: true }` | Clears `archivedAt`, sets `status = active`. Writes audit. |
-| `regeneratePublicToken` | `{ id }` | `{ ok: true, data: { newToken } }` | New nanoid(21) into `publicToken`. Writes `project.regenerated-token` audit. |
+| Action                  | Input                                 | Output                             | Side effects                                                                                                                             |
+| ----------------------- | ------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `createProject`         | `createProjectSchema`                 | `{ ok: true, data: { id } }`       | Generates `publicToken`; inserts; writes `project.created` audit.                                                                        |
+| `updateProject`         | `updateProjectSchema` (id + partials) | `{ ok: true, data: Project }`      | Updates fields. Currency, status, archive state are not editable via this action.                                                        |
+| `setProjectStatus`      | `{ id, status }`                      | `{ ok: true, data: Project }`      | Validates transition. Writes `project.status-changed` audit with `{ from, to }`. Sets `endedAt = now` when transitioning to `completed`. |
+| `archiveProject`        | `{ id }`                              | `{ ok: true }`                     | Sets `archivedAt = now`, `status = archived`. Writes audit.                                                                              |
+| `unarchiveProject`      | `{ id }`                              | `{ ok: true }`                     | Clears `archivedAt`, sets `status = active`. Writes audit.                                                                               |
+| `regeneratePublicToken` | `{ id }`                              | `{ ok: true, data: { newToken } }` | New nanoid(21) into `publicToken`. Writes `project.regenerated-token` audit.                                                             |
 
 ## Repository Functions
 
@@ -135,12 +135,12 @@ In `src/lib/repositories/projects.repo.ts`:
 - **Start / end dates.** Optional. If both set, end must be on or after start.
 - **Status transition table:**
 
-  | From | To allowed |
-  |---|---|
-  | active | on_hold, completed, archived |
-  | on_hold | active, completed, archived |
-  | completed | active (re-open), archived |
-  | archived | active (unarchive only) |
+  | From      | To allowed                   |
+  | --------- | ---------------------------- |
+  | active    | on_hold, completed, archived |
+  | on_hold   | active, completed, archived  |
+  | completed | active (re-open), archived   |
+  | archived  | active (unarchive only)      |
 
   Disallowed transitions return `{ ok: false, error: "INVALID_TRANSITION" }`.
 

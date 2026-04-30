@@ -4,17 +4,17 @@ Middlemist is a single Next.js 15 application deployed on Vercel. There is no se
 
 ## Providers
 
-| Provider | Role | Plan |
-|---|---|---|
-| Vercel | Application hosting (Edge + Node runtimes) | Pro (Hobby until first paying tenant) |
-| Neon | Postgres for application data and audit log | Free (paid tier when storage/compute requires) |
-| UploadThing | File storage for user-uploaded assets | Free (caps reviewed quarterly) |
-| Inngest | Background jobs (cron + event-driven) | Free (caps reviewed quarterly) |
-| Resend | Transactional email | Free (3,000/month) |
-| Upstash Redis | Sliding-window rate limits | Free |
-| Sentry | Error tracking and performance traces | Free |
-| Plausible | Marketing analytics | Self-hosted or paid (paid for v1) |
-| Cloudflare R2 | Off-platform `pg_dump` archive | Free tier covers v1 |
+| Provider      | Role                                        | Plan                                           |
+| ------------- | ------------------------------------------- | ---------------------------------------------- |
+| Vercel        | Application hosting (Edge + Node runtimes)  | Pro (Hobby until first paying tenant)          |
+| Neon          | Postgres for application data and audit log | Free (paid tier when storage/compute requires) |
+| UploadThing   | File storage for user-uploaded assets       | Free (caps reviewed quarterly)                 |
+| Inngest       | Background jobs (cron + event-driven)       | Free (caps reviewed quarterly)                 |
+| Resend        | Transactional email                         | Free (3,000/month)                             |
+| Upstash Redis | Sliding-window rate limits                  | Free                                           |
+| Sentry        | Error tracking and performance traces       | Free                                           |
+| Plausible     | Marketing analytics                         | Self-hosted or paid (paid for v1)              |
+| Cloudflare R2 | Off-platform `pg_dump` archive              | Free tier covers v1                            |
 
 The Vercel project is named `middlemist`. The Neon project is named `middlemist`, with branches per environment.
 
@@ -80,7 +80,7 @@ The build command in `vercel.json`:
 }
 ```
 
-The migrate step is *not* in `buildCommand`. Migrations run in a separate "post-deploy" step (or, in v1, manually before merging the migration PR). The reason: a failed migration during build leaves the deploy in a broken state with no clear rollback path. Running migrations as a separate, observable step keeps "deploy" and "migrate" reversible independently.
+The migrate step is _not_ in `buildCommand`. Migrations run in a separate "post-deploy" step (or, in v1, manually before merging the migration PR). The reason: a failed migration during build leaves the deploy in a broken state with no clear rollback path. Running migrations as a separate, observable step keeps "deploy" and "migrate" reversible independently.
 
 ## Database migrations
 
@@ -89,7 +89,7 @@ Migrations live in `prisma/migrations/` and are committed alongside the schema c
 1. **Develop locally.** `pnpm db:migrate` runs `prisma migrate dev` against the dev database. The migration file lands in `prisma/migrations/<timestamp>_<name>/migration.sql`.
 2. **Push to PR.** The migration is reviewed alongside the code change.
 3. **Apply to preview database.** Manually: `DATABASE_URL=<preview-db> pnpm prisma migrate deploy`. The preview deploy then has the schema it needs.
-4. **Merge.** On merge to `main`, the contributor manually runs `DATABASE_URL=<production-db> pnpm prisma migrate deploy` *before* triggering the Vercel production deploy. (Vercel can be paused with `vercel pull` while the migration runs; resume after.)
+4. **Merge.** On merge to `main`, the contributor manually runs `DATABASE_URL=<production-db> pnpm prisma migrate deploy` _before_ triggering the Vercel production deploy. (Vercel can be paused with `vercel pull` while the migration runs; resume after.)
 5. **Smoke check.** Hit `/api/health` and verify it returns 200.
 
 The "manually run migrate before deploy" step is intentional. Automating it through Vercel's build is convenient until the first migration fails on production data; at that point the build is broken, the previous version is gone, and the rollback path is murky. Manual migrate keeps the two operations independent.
@@ -127,7 +127,7 @@ v1 anticipates zero such migrations. The data model is stable enough that planne
 
 Two paths.
 
-**Application rollback.** Vercel keeps every previous deployment. *Project → Deployments → <previous deploy> → Promote to Production* swaps the production alias to the prior build. Takes seconds. The previous build stays running until traffic shifts, so there is no downtime.
+**Application rollback.** Vercel keeps every previous deployment. _Project → Deployments → <previous deploy> → Promote to Production_ swaps the production alias to the prior build. Takes seconds. The previous build stays running until traffic shifts, so there is no downtime.
 
 **Database rollback.** Harder. If a migration applied to production turned out to be destructive, the recovery path is:
 

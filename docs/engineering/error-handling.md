@@ -4,18 +4,18 @@ Errors flow through four layers, and each layer has one job. The repository laye
 
 ## Layers and responsibilities
 
-| Layer | Failure mode | What happens |
-|---|---|---|
-| Repository | Read miss | Returns `null`. |
-| Repository | Mutation miss (cross-tenant or non-existent) | Throws a typed `Error` with a code (`CLIENT_NOT_FOUND`). |
-| Service | Business rule violation | Throws `ValidationError`, `ConflictError`, etc. |
-| Service | Not found | Throws `NotFoundError`. |
-| Service | Forbidden state | Throws `ForbiddenError`. |
-| Service | External provider failure | Throws `IntegrationError`. |
-| Server action | Catches every throw | Returns `{ ok: false, error }`. |
-| Server action | Successful handler | Returns `{ ok: true, data }`. |
-| UI | `result.ok === false` | Renders toast or inline error using `friendlyMessage(code)`. |
-| UI | `result.ok === true` | Renders success state. |
+| Layer         | Failure mode                                 | What happens                                                 |
+| ------------- | -------------------------------------------- | ------------------------------------------------------------ |
+| Repository    | Read miss                                    | Returns `null`.                                              |
+| Repository    | Mutation miss (cross-tenant or non-existent) | Throws a typed `Error` with a code (`CLIENT_NOT_FOUND`).     |
+| Service       | Business rule violation                      | Throws `ValidationError`, `ConflictError`, etc.              |
+| Service       | Not found                                    | Throws `NotFoundError`.                                      |
+| Service       | Forbidden state                              | Throws `ForbiddenError`.                                     |
+| Service       | External provider failure                    | Throws `IntegrationError`.                                   |
+| Server action | Catches every throw                          | Returns `{ ok: false, error }`.                              |
+| Server action | Successful handler                           | Returns `{ ok: true, data }`.                                |
+| UI            | `result.ok === false`                        | Renders toast or inline error using `friendlyMessage(code)`. |
+| UI            | `result.ok === true`                         | Renders success state.                                       |
 
 Each layer catches what is below it. Below the action layer, every throw is treated as a programming error and is logged to Sentry (except for `AppError` subclasses, which are expected and not captured).
 
@@ -31,7 +31,11 @@ export class AppError extends Error {
   readonly statusHint: number;
   readonly meta?: Record<string, unknown>;
 
-  constructor(code: string, message?: string, opts: { statusHint?: number; meta?: Record<string, unknown> } = {}) {
+  constructor(
+    code: string,
+    message?: string,
+    opts: { statusHint?: number; meta?: Record<string, unknown> } = {},
+  ) {
     super(message ?? code);
     this.code = code;
     this.statusHint = opts.statusHint ?? 400;
@@ -41,32 +45,32 @@ export class AppError extends Error {
 }
 
 export class NotFoundError extends AppError {
-  constructor(code: string = "NOT_FOUND", message?: string) {
+  constructor(code: string = 'NOT_FOUND', message?: string) {
     super(code, message, { statusHint: 404 });
   }
 }
 
 export class ConflictError extends AppError {
-  constructor(code: string = "CONFLICT", message?: string) {
+  constructor(code: string = 'CONFLICT', message?: string) {
     super(code, message, { statusHint: 409 });
   }
 }
 
 export class ValidationError extends AppError {
-  constructor(code: string = "VALIDATION", message?: string, meta?: Record<string, unknown>) {
+  constructor(code: string = 'VALIDATION', message?: string, meta?: Record<string, unknown>) {
     super(code, message, { statusHint: 400, meta });
   }
 }
 
 export class ForbiddenError extends AppError {
-  constructor(code: string = "FORBIDDEN", message?: string) {
+  constructor(code: string = 'FORBIDDEN', message?: string) {
     super(code, message, { statusHint: 403 });
   }
 }
 
 export class RateLimitError extends AppError {
   constructor(retryAfter: number) {
-    super("RATE_LIMITED", "Slow down a little.", { statusHint: 429, meta: { retryAfter } });
+    super('RATE_LIMITED', 'Slow down a little.', { statusHint: 429, meta: { retryAfter } });
   }
 }
 
@@ -90,12 +94,12 @@ The hierarchy is small on purpose. Adding a class is a real decision (it propaga
 
 ## Sentry capture rules
 
-The Sentry SDK is configured to capture every unhandled throw. The application explicitly does *not* capture `AppError` instances:
+The Sentry SDK is configured to capture every unhandled throw. The application explicitly does _not_ capture `AppError` instances:
 
 ```typescript
 // src/lib/sentry.ts (excerpt)
-import * as Sentry from "@sentry/nextjs";
-import { AppError } from "@/lib/utils/errors";
+import * as Sentry from '@sentry/nextjs';
+import { AppError } from '@/lib/utils/errors';
 
 Sentry.init({
   dsn: env.SENTRY_DSN,
@@ -121,31 +125,32 @@ Inside the action wrapper, `IntegrationError` is captured explicitly through `Se
 // src/lib/utils/errors.ts (excerpt)
 
 const friendly: Record<string, string> = {
-  UNAUTHENTICATED: "Please log in and try again.",
+  UNAUTHENTICATED: 'Please log in and try again.',
   RATE_LIMITED: "You're moving fast. Try again in a few seconds.",
-  UNEXPECTED: "Something went wrong on our side. Try again, or reach out if it keeps happening.",
+  UNEXPECTED: 'Something went wrong on our side. Try again, or reach out if it keeps happening.',
 
-  CLIENT_NOT_FOUND: "That client no longer exists.",
-  PROJECT_NOT_FOUND: "That project no longer exists.",
-  PROPOSAL_NOT_FOUND: "That proposal no longer exists.",
-  INVOICE_NOT_FOUND: "That invoice no longer exists.",
+  CLIENT_NOT_FOUND: 'That client no longer exists.',
+  PROJECT_NOT_FOUND: 'That project no longer exists.',
+  PROPOSAL_NOT_FOUND: 'That proposal no longer exists.',
+  INVOICE_NOT_FOUND: 'That invoice no longer exists.',
 
-  PROPOSAL_NOT_DRAFT: "Only draft proposals can be sent.",
-  PROPOSAL_ALREADY_DECIDED: "This proposal has already been accepted or declined.",
+  PROPOSAL_NOT_DRAFT: 'Only draft proposals can be sent.',
+  PROPOSAL_ALREADY_DECIDED: 'This proposal has already been accepted or declined.',
   INVOICE_NOT_PAYABLE: "This invoice can't be marked paid in its current state.",
 
   CLIENT_EMAIL_BOUNCED: "This client's email has bounced. Update it before sending.",
-  EMAIL_TAKEN: "An account with that email already exists.",
-  EMAIL_NOT_VERIFIED: "Please verify your email address before logging in.",
-  INVALID_CREDENTIALS: "Incorrect email or password.",
+  EMAIL_TAKEN: 'An account with that email already exists.',
+  EMAIL_NOT_VERIFIED: 'Please verify your email address before logging in.',
+  INVALID_CREDENTIALS: 'Incorrect email or password.',
 
   INTEGRATION_RESEND: "We couldn't reach the email provider. The retry will fire automatically.",
   INTEGRATION_UPLOADTHING: "We couldn't reach the file storage provider. Try again.",
-  INTEGRATION_EXCHANGERATE: "Currency rates are temporarily unavailable. Saved with the latest cached rate.",
+  INTEGRATION_EXCHANGERATE:
+    'Currency rates are temporarily unavailable. Saved with the latest cached rate.',
 };
 
 export function friendlyMessage(code: string): string {
-  return friendly[code] ?? "Something went wrong. Please try again.";
+  return friendly[code] ?? 'Something went wrong. Please try again.';
 }
 ```
 
@@ -168,7 +173,7 @@ if (!result.ok) {
   toast.error(friendlyMessage(result.error));
   return;
 }
-toast.success("Client archived");
+toast.success('Client archived');
 router.refresh();
 ```
 
@@ -180,12 +185,12 @@ async function onSubmit(values: CreateClientInput) {
     if (result.issues) {
       // map per-field issues back to the form
       for (const issue of result.issues) {
-        const path = issue.path.join(".");
+        const path = issue.path.join('.');
         form.setError(path as keyof CreateClientInput, { message: issue.message });
       }
       return;
     }
-    form.setError("root", { message: friendlyMessage(result.error) });
+    form.setError('root', { message: friendlyMessage(result.error) });
     return;
   }
   router.push(`/clients/${result.data.id}`);
@@ -229,16 +234,16 @@ The bare `Error` here is acceptable because the caller (always a service) catche
 ### Service throwing typed
 
 ```typescript
-import { NotFoundError, ValidationError } from "@/lib/utils/errors";
+import { NotFoundError, ValidationError } from '@/lib/utils/errors';
 
 export const proposalsService = {
   async send(userId: string, id: string) {
     const proposal = await proposalsRepo.findById(userId, id);
-    if (!proposal) throw new NotFoundError("PROPOSAL_NOT_FOUND");
-    if (proposal.status !== "draft") {
-      throw new ValidationError("PROPOSAL_NOT_DRAFT", "Only draft proposals can be sent.");
+    if (!proposal) throw new NotFoundError('PROPOSAL_NOT_FOUND');
+    if (proposal.status !== 'draft') {
+      throw new ValidationError('PROPOSAL_NOT_DRAFT', 'Only draft proposals can be sent.');
     }
-    return proposalsRepo.update(userId, id, { status: "sent", sentAt: new Date() });
+    return proposalsRepo.update(userId, id, { status: 'sent', sentAt: new Date() });
   },
 };
 ```
@@ -248,12 +253,9 @@ The service explicitly types its throws. The action wrapper recognizes them thro
 ### Action returning typed error
 
 ```typescript
-export const sendProposal = withAuth(
-  z.object({ id: z.string() }),
-  async (userId, { id }) => {
-    return proposalsService.send(userId, id);
-  }
-);
+export const sendProposal = withAuth(z.object({ id: z.string() }), async (userId, { id }) => {
+  return proposalsService.send(userId, id);
+});
 ```
 
 The action does not have a try/catch. The wrapper handles it. Result on failure: `{ ok: false, error: "PROPOSAL_NOT_DRAFT" }`.
@@ -267,7 +269,7 @@ async function handleSend() {
     toast.error(friendlyMessage(result.error));
     return;
   }
-  toast.success("Proposal sent");
+  toast.success('Proposal sent');
   router.refresh();
 }
 ```
