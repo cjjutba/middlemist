@@ -52,7 +52,12 @@ const serverSchema = z.object({
   // Background jobs
   INNGEST_EVENT_KEY: z.string().optional(),
   INNGEST_SIGNING_KEY: z.string().optional(),
-  INNGEST_DEV: z.coerce.boolean().default(false),
+  // Env var values are strings; the literal "false" is truthy under
+  // z.coerce.boolean() (Boolean('false') is true). Hand-roll the coercion.
+  INNGEST_DEV: z
+    .string()
+    .optional()
+    .transform((v) => v === 'true' || v === '1'),
 
   // File uploads (UploadThing v7)
   UPLOADTHING_TOKEN: z.string().optional(),
@@ -75,8 +80,13 @@ const serverSchema = z.object({
   SENTRY_DSN: z.string().url().optional(),
   SENTRY_AUTH_TOKEN: z.string().optional(),
 
-  // Dev-only override; rejected at runtime if set in production
-  DISABLE_RATE_LIMITS: z.coerce.boolean().default(false),
+  // Dev-only override; rejected at runtime if set in production.
+  // String coercion: only the literal "true"/"1" disable rate limits;
+  // anything else (including the string "false") is treated as not-disabled.
+  DISABLE_RATE_LIMITS: z
+    .string()
+    .optional()
+    .transform((v) => v === 'true' || v === '1'),
 });
 
 // ─── public (NEXT_PUBLIC_) values ─────────────────────────────────────────
