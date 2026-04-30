@@ -1,6 +1,10 @@
 import Link from 'next/link';
+import { auth } from '@/lib/auth';
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  const isAuthed = Boolean(session?.user?.id);
+
   return (
     <div className="bg-canvas flex min-h-screen flex-col">
       <header className="border-hairline-soft border-b">
@@ -11,17 +15,26 @@ export default function Home() {
           >
             middlemist
           </Link>
-          <div className="flex items-center gap-3">
-            <Link href="#" className="text-muted hover:text-ink text-[14px] font-medium">
-              Sign in
-            </Link>
+          {isAuthed ? (
             <Link
-              href="#"
-              className="bg-primary text-on-primary hover:bg-primary-active inline-flex h-10 items-center justify-center rounded-md px-5 text-[14px] font-semibold transition-colors"
+              href="/dashboard"
+              className="border-hairline bg-canvas text-ink hover:bg-surface-soft inline-flex h-10 items-center justify-center rounded-md border px-5 text-[14px] font-semibold transition-colors"
             >
-              Sign up free
+              Dashboard
             </Link>
-          </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link href="/login" className="text-muted hover:text-ink text-[14px] font-medium">
+                Sign in
+              </Link>
+              <Link
+                href="/signup"
+                className="bg-primary text-on-primary hover:bg-primary-active inline-flex h-10 items-center justify-center rounded-md px-5 text-[14px] font-semibold transition-colors"
+              >
+                Sign up free
+              </Link>
+            </div>
+          )}
         </nav>
       </header>
 
