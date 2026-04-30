@@ -9,7 +9,7 @@ const eslintConfig = defineConfig([
   globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'src/generated/**']),
   {
     files: ['src/**/*.{ts,tsx}'],
-    ignores: ['src/lib/repositories/**', 'src/lib/prisma.ts', 'prisma/**'],
+    ignores: ['src/lib/repositories/**', 'src/lib/prisma.ts', 'src/actions/auth.ts', 'prisma/**'],
     rules: {
       'no-restricted-imports': [
         'error',

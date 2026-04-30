@@ -73,6 +73,7 @@ model User {
   email            String    @unique
   emailVerifiedAt  DateTime?
   passwordHash     String?
+  passwordVersion  Int       @default(0)
   name             String
   businessName     String?
   businessAddress  String?

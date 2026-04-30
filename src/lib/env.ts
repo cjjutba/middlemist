@@ -134,9 +134,13 @@ if (!clientParsed.success) {
   throw new Error('Invalid public environment variables');
 }
 
-// Production guard: DISABLE_RATE_LIMITS must never be true in production.
+// Production guard: DISABLE_RATE_LIMITS must never be true in production runtime.
+// Skipped during `next build` page collection (NEXT_PHASE === 'phase-production-build')
+// because that phase loads .env.local locally even though NODE_ENV=production.
+const isBuildPhase = process.env['NEXT_PHASE'] === 'phase-production-build';
 if (
   isServer &&
+  !isBuildPhase &&
   serverParsed.data.NODE_ENV === 'production' &&
   serverParsed.data.DISABLE_RATE_LIMITS
 ) {
