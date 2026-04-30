@@ -21,6 +21,28 @@ export const actionRegistry: Record<string, z.ZodSchema> = {
   'user.email-changed': z.object({ from: z.string().email(), to: z.string().email() }).strict(),
   'user.account-deleted': empty,
   'user.account-deletion-cancelled': empty,
+
+  // Client
+  'client.created': empty,
+  'client.updated': empty,
+  'client.archived': empty,
+  'client.unarchived': empty,
+  'client.deleted': empty,
+
+  // Project (registered now; actions land in 3C)
+  'project.created': empty,
+  'project.updated': empty,
+  'project.status-changed': z
+    .object({ from: z.string(), to: z.string() })
+    .strict()
+    .or(z.object({ status: z.string() }).strict()),
+  'project.archived': empty,
+  'project.unarchived': empty,
+
+  // Onboarding (lands in 3D)
+  'onboarding.business': empty,
+  'onboarding.currency': empty,
+  'onboarding.completed': empty,
 };
 
 export type AuditActionName = keyof typeof actionRegistry;

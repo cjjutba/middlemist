@@ -103,4 +103,14 @@ export const clientsRepo = {
     });
     if (result.count === 0) throw new Error('CLIENT_NOT_FOUND');
   },
+
+  /**
+   * Hard-delete. Per docs/spec/03-clients.md, delete fails if the client has
+   * projects/proposals/invoices (FK Restrict). Caller should catch and
+   * surface CLIENT_HAS_REFERENCES so the UI can suggest archive instead.
+   */
+  async delete(userId: string, id: string) {
+    const result = await prisma.client.deleteMany({ where: { id, userId } });
+    if (result.count === 0) throw new Error('CLIENT_NOT_FOUND');
+  },
 };

@@ -56,7 +56,7 @@ export function LoginForm() {
           type="email"
           autoComplete="email"
           {...register('email')}
-          className="bg-canvas border-hairline text-ink w-full rounded-md border px-3.5 py-2.5 text-[16px] outline-none focus:border-black focus:ring-2 focus:ring-black/10"
+          className="bg-canvas border-hairline text-ink focus:border-primary w-full rounded-md border px-3.5 py-2.5 text-[16px] outline-none focus:ring-2 focus:ring-black/10"
         />
         {errors.email ? (
           <span className="text-error mt-1 block text-[13px]">{errors.email.message}</span>
@@ -69,7 +69,7 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           {...register('password')}
-          className="bg-canvas border-hairline text-ink w-full rounded-md border px-3.5 py-2.5 text-[16px] outline-none focus:border-black focus:ring-2 focus:ring-black/10"
+          className="bg-canvas border-hairline text-ink focus:border-primary w-full rounded-md border px-3.5 py-2.5 text-[16px] outline-none focus:ring-2 focus:ring-black/10"
         />
         {errors.password ? (
           <span className="text-error mt-1 block text-[13px]">{errors.password.message}</span>
