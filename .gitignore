@@ -30,8 +30,13 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files (.env.example IS tracked; everything else is local secrets)
+.env
+.env.local
+.env.*.local
+
+# Docker volumes are not in the repo, but be safe
+.docker/
 
 # vercel
 .vercel
