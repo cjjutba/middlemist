@@ -4,9 +4,9 @@ import { limits, type LimitName, type LimitResult } from './lib/ratelimit';
 import { buildSecurityHeaders } from './lib/security/csp';
 
 /**
- * Edge-equivalent middleware. Runs in the Node runtime (see config.runtime
- * below) so ioredis works for local rate-limit testing; Upstash REST works
- * here too for production.
+ * Next 16 "proxy" (formerly "middleware"). Runs in the Node runtime (see
+ * config.runtime below) so ioredis works for local rate-limit testing;
+ * Upstash REST works here too for production.
  *
  * Three responsibilities, in order:
  *  1. IP-based rate limits on auth + public-link routes per
@@ -68,7 +68,7 @@ function rateLimited(result: LimitResult): NextResponse | null {
   });
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 1) Rate limits
@@ -101,10 +101,10 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
+// Proxy in Next 16 always runs on Node.js — no runtime config needed.
+// ioredis works here for the local rate-limit backend; Upstash REST works
+// for production.
 export const config = {
-  // Node runtime: middleware needs ioredis (Node net) for the local rate-limit
-  // backend. Upstash REST works here too.
-  runtime: 'nodejs',
   // Match everything except Next internals, static assets, and static files.
   // We DO match /api/auth/* so the credentials-callback POST flows through.
   matcher: [

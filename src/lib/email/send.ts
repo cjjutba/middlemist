@@ -3,6 +3,23 @@ import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { Resend } from 'resend';
 import { env, isUsingLocalSmtp } from '../env';
 
+// Fail-fast guard. In production runtime the app must use Resend; silently
+// falling back to the local Mailpit transport would mean transactional mail
+// goes nowhere. Crash at module load with a clear message so a
+// misconfigured deploy is caught before the first password reset.
+//
+// Skipped during `next build` page collection (NEXT_PHASE) because that
+// phase loads .env.local locally even though NODE_ENV=production. Real
+// production deployments don't carry .env.local; the runtime check still
+// fires there.
+const isBuildPhase = process.env['NEXT_PHASE'] === 'phase-production-build';
+if (!isBuildPhase && env.NODE_ENV === 'production' && !env.RESEND_API_KEY) {
+  throw new Error(
+    'RESEND_API_KEY is required when NODE_ENV=production. ' +
+      'Set it in Vercel project env vars before deploying.',
+  );
+}
+
 /**
  * Email sender abstraction.
  *
